@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wordhead"
+version = "0.1.0"
+description = "Measure how much of an LLM's output is spent spelling out words it has already decided on, probe the internal word plan, and decode whole words losslessly."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "torch>=2.2",
+  "transformers>=4.45",
+  "numpy",
+  "scikit-learn",
+  "matplotlib",
+]
+
+[project.optional-dependencies]
+data = ["datasets", "huggingface_hub"]
+dev = ["pytest"]
+
+[project.scripts]
+wordhead = "wordhead.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["wordhead*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not slow'"
+markers = ["slow: needs a real pretrained model download"]
