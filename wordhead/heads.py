@@ -38,6 +38,22 @@ class Lexicon:
                 self.by_prefix[w[:k]].append(i)
 
     @classmethod
+    def from_texts(cls, tokenizer, texts: list[str], size: int = 20000, min_count: int = 2, max_len: int = 256) -> "Lexicon":
+        """Tokenizer-only lexicon (no model pass), so it can cover far more text."""
+        from .words import Segmenter
+
+        seg = Segmenter(tokenizer)
+        cnt, text = Counter(), {}
+        for t in texts:
+            ids = tokenizer(t, add_special_tokens=False)["input_ids"][:max_len]
+            for u in seg.segment(ids)[:-1]:  # the last unit may be truncated
+                if u.kind == "word" and u.n_tokens >= 2:
+                    cnt[u.ids] += 1
+                    text[u.ids] = u.text
+        items = [(w, c) for w, c in cnt.most_common() if c >= min_count][:size]
+        return cls(words=[w for w, _ in items], freq=[c for _, c in items], texts=[text[w] for w, _ in items])
+
+    @classmethod
     def from_records(cls, records: list[SeqRecord], size: int = 5000, min_count: int = 2) -> "Lexicon":
         cnt, text = Counter(), {}
         for rec in records:
@@ -75,7 +91,14 @@ class WordHead(torch.nn.Module):
         return self.lin((h.float() - self.mu) / self.sd)
 
 
-def head_training_data(records: list[SeqRecord], lexicon: Lexicon, layer: int):
+def head_training_data(records: list[SeqRecord], lexicon: Lexicon, layer: int, mode: str = "preword"):
+    """Features and labels for a word head.
+
+    ``preword``: one sample per multi-token word, the state before the word.
+    ``current``: additionally the states inside the word (after 1, 2, ... tokens
+    are written), so one position-agnostic head can re-draft as the word unfolds.
+    Multi-token words outside the lexicon are labelled OTHER.
+    """
     X, y = [], []
     other = len(lexicon)
     for rec in records:
@@ -84,8 +107,14 @@ def head_training_data(records: list[SeqRecord], lexicon: Lexicon, layer: int):
             continue
         for row, ui in enumerate(rec.preword_units):
             u = rec.units[ui]
+            label = lexicon.index.get(u.ids, other)
             X.append(H[row])
-            y.append(lexicon.index.get(u.ids, other))
+            y.append(label)
+            if mode == "current" and layer in rec.inword_hidden:
+                o, c = rec.inword_offset[row], rec.inword_count[row]
+                for j in range(c):
+                    X.append(rec.inword_hidden[layer][o + j])
+                    y.append(label)
     return np.stack(X).astype(np.float32), np.array(y)
 
 
@@ -115,70 +144,107 @@ def fit_head(X: np.ndarray, y: np.ndarray, n_words: int, epochs: int = 30, lr: f
 
 
 class DictionaryDrafter:
+    """Context-blind baseline: the most frequent lexicon word with this prefix."""
     name = "dictionary"
 
     def __init__(self, lexicon: Lexicon):
         self.lex = lexicon
+        self._best = {p: max(c, key=lambda i: lexicon.freq[i]) for p, c in lexicon.by_prefix.items()}
 
-    def draft(self, prefix: tuple[int, ...], h=None) -> list[int]:
-        cands = self.lex.by_prefix.get(tuple(prefix))
-        if not cands:
+    def draft(self, prefix: tuple[int, ...], h=None, h_cur=None) -> list[int]:
+        best = self._best.get(tuple(prefix))
+        if best is None:
             return []
-        best = max(cands, key=lambda i: self.lex.freq[i])
         return list(self.lex.words[best][len(prefix):])
 
 
 class HeadDrafter:
+    """Ranks the lexicon words that match the written prefix with a word head.
+
+    ``mode="preword"`` reads only the state before the word (one evaluation per
+    word). ``mode="current"`` reads the freshest state, the one that emitted
+    the latest token. Falls back to ``fallback`` (e.g. a dictionary over a
+    larger lexicon) when no head word matches the prefix.
+    """
     name = "head"
 
-    def __init__(self, lexicon: Lexicon, head: WordHead):
-        self.lex = lexicon
-        self.head = head
+    def __init__(self, lexicon: Lexicon, head: WordHead, mode: str = "preword", fallback=None):
+        self.lex, self.head, self.mode, self.fallback = lexicon, head, mode, fallback
+        self._h = None
+        self._scores = None
 
     @torch.no_grad()
     def scores(self, h) -> np.ndarray:
-        ht = h.detach().float().cpu() if torch.is_tensor(h) else torch.from_numpy(np.asarray(h, dtype=np.float32))
-        return self.head(ht[None])[0].numpy()
+        if h is not self._h:
+            ht = h.detach().float().cpu() if torch.is_tensor(h) else torch.from_numpy(np.asarray(h, dtype=np.float32))
+            self._scores = self.head(ht[None])[0].numpy()
+            self._h = h
+        return self._scores
 
-    def draft(self, prefix: tuple[int, ...], h=None) -> list[int]:
-        cands = self.lex.by_prefix.get(tuple(prefix))
-        if not cands or h is None:
-            return []
-        s = self.scores(h)
-        best = max(cands, key=lambda i: s[i])
+    def draft(self, prefix: tuple[int, ...], h=None, h_cur=None) -> list[int]:
+        prefix = tuple(prefix)
+        cands = self.lex.by_prefix.get(prefix)
+        feat = h_cur if (self.mode == "current" and h_cur is not None) else h
+        if not cands or feat is None:
+            return self.fallback.draft(prefix) if self.fallback is not None else []
+        s = self.scores(feat)
+        best = cands[int(np.argmax(s[cands]))]
         return list(self.lex.words[best][len(prefix):])
 
 
-def emulated_acceptance(records: list[SeqRecord], drafter, layer: int | None, kinds=("word",)) -> dict:
-    """Teacher-forced emulation on natural text.
+class OracleDrafter:
+    """Upper bound for emulation: always drafts the true remainder of the word."""
+    name = "oracle"
 
-    For each multi-token word, give the drafter the true first token (as the
-    target model would have produced it) and count how many of the drafted
-    continuation tokens match the text *and* the model's own greedy choice.
-    These are the sequential decoding steps the drafter would have saved.
+    def __init__(self):
+        self.truth: tuple[int, ...] = ()
+
+    def draft(self, prefix, h=None, h_cur=None):
+        return list(self.truth[len(prefix):])
+
+
+def emulated_steps(records: list[SeqRecord], drafter, layer: int | None, kinds=("word",)) -> dict:
+    """Teacher-forced emulation of the lossless decoder on natural text.
+
+    For each multi-token word the decoder loop is replayed: the target model
+    emits one token per forward pass; after each pass the drafter proposes the
+    rest of the word from the tokens written so far, and drafted tokens are
+    accepted while they equal the text *and* the model's own greedy choice
+    (so acceptance is what greedy verification would accept). Returns forward
+    passes needed per word token (1.0 = no saving).
     """
-    saved, cont_total, drafted, words = 0, 0, 0, 0
-    exact = 0
+    steps = tokens = words = exact = drafted_tok = accepted_tok = 0
     for rec in records:
-        H = rec.preword_hidden.get(layer) if layer is not None else None
         row_of = {ui: r for r, ui in enumerate(rec.preword_units)}
         for ui, u in enumerate(rec.units):
             if u.kind not in kinds or u.start < 1 or u.n_tokens < 2:
                 continue
-            words += 1
-            h = H[row_of[ui]] if H is not None and ui in row_of else None
-            d = drafter.draft((u.ids[0],), h)
-            truth = list(u.ids[1:])
-            ok_model = rec.top1[u.start + 1 : u.end]
-            k = 0
-            for j, tokd in enumerate(d):
-                if j < len(truth) and tokd == truth[j] and ok_model[j]:
-                    k += 1
-                else:
+            row = row_of.get(ui)
+            h = rec.state_for_prefix(layer, row, 1) if layer is not None and row is not None else None
+            if isinstance(drafter, OracleDrafter):
+                drafter.truth = u.ids
+            n = u.n_tokens
+            ok = rec.top1[u.start : u.end]
+            j, s, first = 0, 0, True
+            while j < n:
+                s += 1  # forward pass that emits token j
+                j += 1
+                if j >= n:
                     break
-            saved += k
-            cont_total += len(truth)
-            drafted += int(bool(d))
-            exact += int(k == len(truth))
-    return dict(words=words, cont_tokens=cont_total, saved=saved, saved_share_of_cont=saved / max(cont_total, 1),
-                draft_rate=drafted / max(words, 1), exact_word_rate=exact / max(words, 1))
+                h_cur = rec.state_for_prefix(layer, row, j) if layer is not None and row is not None else None
+                d = drafter.draft(u.ids[:j], h, h_cur)
+                k = 0
+                while k < len(d) and j + k < n and d[k] == u.ids[j + k] and ok[j + k]:
+                    k += 1
+                drafted_tok += min(len(d), n - j)
+                accepted_tok += k
+                if first and k == n - 1:
+                    exact += 1
+                first = False
+                j += k
+            steps += s
+            tokens += n
+            words += 1
+    return dict(words=words, tokens=tokens, steps=steps, steps_per_token=steps / max(tokens, 1),
+                step_reduction=tokens / max(steps, 1), acceptance=accepted_tok / max(drafted_tok, 1),
+                whole_word_first_draft=exact / max(words, 1))

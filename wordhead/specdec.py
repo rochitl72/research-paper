@@ -66,7 +66,7 @@ def generate(lm: Loaded, prompt_ids: list[int], max_new: int, drafter=None, laye
             break
         if drafter is not None and hasattr(drafter, "observe"):
             drafter.observe(gen + [t])  # optional hook: tokens committed so far
-        draft = drafter.draft(tuple(prefix), pre_h) if drafter is not None else []
+        draft = drafter.draft(tuple(prefix), pre_h, last_h) if drafter is not None else []
         draft = draft[: max(0, max_new - len(gen) - 1)]
         inp = [t] + draft
         out = lm.model(input_ids=torch.tensor([inp], device=lm.device), past_key_values=cache, use_cache=True,
@@ -86,7 +86,7 @@ def generate(lm: Loaded, prompt_ids: list[int], max_new: int, drafter=None, laye
         prev = kept[-1]
         cache_len += 1 + k
         if k < len(draft):
-            cache.crop(cache_len)
+            cache.crop(-(len(draft) - k))  # drop rejected draft positions
         last_logits = out.logits[0, k]
         last_h = out.hidden_states[layer][0, k] if need_h else None
         if draft:

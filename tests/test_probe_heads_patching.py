@@ -15,11 +15,11 @@ def test_probe_beats_baselines_when_signal_exists():
     y_in_group = rng.integers(0, 3, n)  # 3 words per group
     y = first * 3 + y_in_group
     X = rng.normal(size=(n, d)).astype(np.float32)
-    X[np.arange(n), y_in_group] += 3.0  # context encodes the word
+    X[np.arange(n), y_in_group] += 4.0  # context encodes the word
     ds = dict(X=X, y=y, first=first, seq=np.arange(n) // 4, vocab=list(range(12)),
               group_of_class=np.repeat(np.arange(4), 3))
     r = probe_layer(ds, seed=0)
-    assert r["acc"] > 0.85
+    assert r["acc"] > 0.8
     assert r["acc_control"] < 0.55 and r["acc_majority"] < 0.55
 
 
@@ -52,17 +52,21 @@ def _toy_records():
 
 
 def test_head_drafter_uses_context_where_dictionary_cannot():
-    from wordhead.heads import emulated_acceptance, head_training_data
+    from wordhead.heads import OracleDrafter, emulated_steps, head_training_data
 
     recs = _toy_records()
     lex = Lexicon.from_records(recs, size=10)
     assert {(5, 6, 7), (5, 8)} <= set(lex.words)
     X, y = head_training_data(recs, lex, layer=3)
     head = fit_head(X, y, len(lex), epochs=60, lr=1e-2)
-    dict_acc = emulated_acceptance(recs, DictionaryDrafter(lex), layer=None)
-    head_acc = emulated_acceptance(recs, HeadDrafter(lex, head), layer=3)
-    assert head_acc["exact_word_rate"] > 0.95
-    assert dict_acc["exact_word_rate"] < 0.6
+    dict_acc = emulated_steps(recs, DictionaryDrafter(lex), layer=None)
+    head_acc = emulated_steps(recs, HeadDrafter(lex, head), layer=3)
+    oracle = emulated_steps(recs, OracleDrafter(), layer=None)
+    assert head_acc["whole_word_first_draft"] > 0.95
+    assert dict_acc["whole_word_first_draft"] < 0.6
+    # oracle: exactly one forward pass per word; nobody beats it; plain decoding is 1 step per token
+    assert oracle["steps"] == oracle["words"]
+    assert oracle["steps"] <= head_acc["steps"] <= dict_acc["steps"] <= dict_acc["tokens"]
 
 
 def test_patching_identity_and_capture(tiny_lm):

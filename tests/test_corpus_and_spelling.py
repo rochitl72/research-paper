@@ -52,3 +52,20 @@ def test_spelling_summary_consistency(tiny_lm):
     assert 0 <= s["spelling_share@0.9"] <= s["cont_share_of_word_tokens"] <= 1
     assert sum(s["boundary_counts"].values()) == s["n_cont_tokens"]
     assert s["spelling_share@0.99"] <= s["spelling_share@0.9"] <= s["spelling_share@0.5"]
+
+
+def test_inword_states_match_full_hidden_states(tiny_lm):
+    recs = run_corpus(tiny_lm, TEXTS, batch_size=3, hidden_layers=[2], inword_layers=[2], inword_positions=3,
+                      progress=False)
+    for text, rec in zip(TEXTS, recs):
+        with torch.no_grad():
+            hs = tiny_lm.model(input_ids=torch.tensor([rec.ids]), output_hidden_states=True).hidden_states[2][0]
+        assert len(rec.inword_offset) == len(rec.preword_units) == len(rec.inword_count)
+        for row, ui in enumerate(rec.preword_units):
+            u = rec.units[ui]
+            assert rec.inword_count[row] == max(0, min(3, u.n_tokens - 2))
+            # prefix of 1 token -> state before the word; prefix of j tokens -> state at token j-2 of the word
+            np.testing.assert_allclose(rec.state_for_prefix(2, row, 1), hs[u.start - 1].numpy(), atol=2e-3)
+            for j in range(2, 2 + rec.inword_count[row]):
+                np.testing.assert_allclose(rec.state_for_prefix(2, row, j), hs[u.start + j - 2].numpy(), atol=2e-3)
+            assert rec.state_for_prefix(2, row, 2 + rec.inword_count[row]) is None

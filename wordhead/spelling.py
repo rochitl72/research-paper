@@ -112,3 +112,20 @@ def frequency_matched_by_length(rows: list[dict], tau=0.9, n_bins=5, min_per_cel
             p = np.exp(np.array([x for r in rs for x in r["cont_logp"]]))
             out.append(dict(freq_bin=b, n_tokens=L, n=len(rs), cont_det=float((p >= tau).mean())))
     return out
+
+
+def bits_by_position(rows: list[dict], max_pos: int = 16) -> list[dict]:
+    """Where inside a word is the information? Mean surprisal (bits) and the
+    share of greedy-correct tokens at each token position of multi-token words."""
+    bits, hits = defaultdict(list), defaultdict(list)
+    for r in rows:
+        if r["n_tokens"] < 2:
+            continue
+        bits[0].append(-r["first_logp"] / LN2)
+        for j, (lp, t1) in enumerate(zip(r["cont_logp"], r["cont_top1"]), start=1):
+            if j >= max_pos:
+                break
+            bits[j].append(-lp / LN2)
+            hits[j].append(t1)
+    return [dict(position=j, n=len(bits[j]), bits=float(np.mean(bits[j])),
+                 greedy_correct=float(np.mean(hits[j])) if j in hits else None) for j in sorted(bits)]
