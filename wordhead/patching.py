@@ -190,3 +190,67 @@ def sweep(lm: Loaded, pairs: list[dict], layers: list[int], where: str = "prewor
         n_pairs=len(out),
         per_pair=out,
     )
+
+
+# ---------------------------------------------------------------------------
+# Attention knockout: is the pre-word position *necessary* for spelling?
+# ---------------------------------------------------------------------------
+
+@torch.no_grad()
+def _cont_logp(lm: Loaded, ids: list[int], start: int, end: int, blocked: int | None):
+    """Sum log p of tokens start+1..end-1 (the word's continuation) and whether all are greedy-correct.
+
+    With ``blocked`` set, the positions inside the word (start..end-1) cannot attend to that
+    context position at any layer; everything else is ordinary causal attention.
+    """
+    T = len(ids)
+    allowed = torch.tril(torch.ones(T, T, dtype=torch.bool, device=lm.device))
+    if blocked is not None:
+        allowed[start:end, blocked] = False
+    dtype = next(lm.model.parameters()).dtype
+    # HF takes a 4D mask in additive form: 0 where attention is allowed, a large negative number elsewhere
+    mask = torch.zeros(T, T, dtype=dtype, device=lm.device).masked_fill(~allowed, torch.finfo(dtype).min)
+    out = lm.model(input_ids=torch.tensor([ids], device=lm.device), attention_mask=mask[None, None])
+    lp = torch.log_softmax(out.logits[0, start : end - 1].double() if dtype == torch.float64 else out.logits[0, start : end - 1].float(), -1)
+    tgt = torch.tensor(ids[start + 1 : end], device=lm.device)
+    return float(lp.gather(-1, tgt[:, None]).sum()), bool((lp.argmax(-1) == tgt).all())
+
+
+def knockout(lm: Loaded, records: list[SeqRecord], n_words: int = 200, ctx_len: int = 64, seed: int = 0, progress=True) -> dict:
+    """Block attention from a word's own positions to one context position and measure the damage.
+
+    Compared positions: the pre-word position (last token before the word), the
+    token before it, and a random earlier context position. If the word plan
+    were handed over through the pre-word position, blocking it should hurt far
+    more than blocking the others.
+    """
+    rng = random.Random(seed)
+    cands = []
+    for rec in records:
+        for u in rec.units:
+            if u.kind == "word" and u.n_tokens >= 3 and u.start >= 12 and rec.top1[u.start + 1 : u.end].all():
+                cands.append((rec, u))
+    rng.shuffle(cands)
+    rows = []
+    for i, (rec, u) in enumerate(cands[:n_words]):
+        lo = max(0, u.start - ctx_len)
+        ids = rec.ids[lo : u.end]
+        s, e = u.start - lo, u.end - lo
+        base, base_ok = _cont_logp(lm, ids, s, e, None)
+        r = dict(n_tokens=u.n_tokens, base=base, base_ok=base_ok)
+        for name, pos in (("preword", s - 1), ("preword_minus_1", s - 2), ("random_context", rng.randrange(1, s - 2))):
+            lp, ok = _cont_logp(lm, ids, s, e, pos)
+            r[name] = lp - base
+            r[name + "_ok"] = ok
+        rows.append(r)
+        if progress:
+            print(f"\r  knockout {i + 1}/{min(n_words, len(cands))}", end="", flush=True)
+    if progress:
+        print()
+    out = dict(n_words=len(rows), base_ok=float(np.mean([r["base_ok"] for r in rows])))
+    for name in ("preword", "preword_minus_1", "random_context"):
+        d = np.array([r[name] for r in rows]) / np.log(2)
+        out[name] = dict(mean_delta_bits=float(d.mean()), median_delta_bits=float(np.median(d)),
+                         still_spelled=float(np.mean([r[name + "_ok"] for r in rows])))
+    out["per_word"] = rows
+    return out

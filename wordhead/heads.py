@@ -121,15 +121,18 @@ def head_training_data(records: list[SeqRecord], lexicon: Lexicon, layer: int, m
 def fit_head(X: np.ndarray, y: np.ndarray, n_words: int, epochs: int = 30, lr: float = 3e-3,
              weight_decay: float = 1e-4, batch_size: int = 1024, seed: int = 0, verbose=False) -> WordHead:
     """Convex fit (multinomial logistic regression) with mini-batch Adam."""
+    from .models import pick_device
+
     torch.manual_seed(seed)
-    Xt, yt = torch.from_numpy(X), torch.from_numpy(y).long()
-    head = WordHead(X.shape[1], n_words)
+    dev = pick_device()
+    Xt, yt = torch.from_numpy(X).to(dev), torch.from_numpy(y).long().to(dev)
+    head = WordHead(X.shape[1], n_words).to(dev)
     head.mu.data = Xt.mean(0)
     head.sd.data = Xt.std(0) + 1e-4
     opt = torch.optim.AdamW(head.lin.parameters(), lr=lr, weight_decay=weight_decay)
     n = len(Xt)
     for ep in range(epochs):
-        perm = torch.randperm(n)
+        perm = torch.randperm(n).to(dev)
         tot = 0.0
         for i in range(0, n, batch_size):
             b = perm[i : i + batch_size]
@@ -140,7 +143,7 @@ def fit_head(X: np.ndarray, y: np.ndarray, n_words: int, epochs: int = 30, lr: f
             tot += float(loss.detach()) * len(b)
         if verbose:
             print(f"  epoch {ep+1}/{epochs} loss {tot / n:.4f}")
-    return head.eval()
+    return head.cpu().eval()
 
 
 class DictionaryDrafter:
@@ -181,15 +184,117 @@ class HeadDrafter:
             self._h = h
         return self._scores
 
+    def has_candidates(self, prefix) -> bool:
+        return tuple(prefix) in self.lex.by_prefix
+
     def draft(self, prefix: tuple[int, ...], h=None, h_cur=None) -> list[int]:
         prefix = tuple(prefix)
         cands = self.lex.by_prefix.get(prefix)
         feat = h_cur if (self.mode == "current" and h_cur is not None) else h
         if not cands or feat is None:
-            return self.fallback.draft(prefix) if self.fallback is not None else []
+            return self.fallback.draft(prefix, h, h_cur) if self.fallback is not None else []
         s = self.scores(feat)
         best = cands[int(np.argmax(s[cands]))]
         return list(self.lex.words[best][len(prefix):])
+
+
+class AheadHead(torch.nn.Module):
+    """Token-ahead heads (Medusa-style, linear): from the state that emitted token t,
+    predict the K tokens after t. Head k scores a small output vocabulary plus a STOP class
+    (word ends, or a token outside that vocabulary).
+
+        logits_k = W_k · standardize(h) + U_k · E[t]
+    """
+
+    def __init__(self, d_model: int, d_emb: int, n_out: int, K: int):
+        super().__init__()
+        self.mu = torch.nn.Parameter(torch.zeros(d_model), requires_grad=False)
+        self.sd = torch.nn.Parameter(torch.ones(d_model), requires_grad=False)
+        self.h = torch.nn.ModuleList(torch.nn.Linear(d_model, n_out + 1) for _ in range(K))
+        self.e = torch.nn.ModuleList(torch.nn.Linear(d_emb, n_out + 1, bias=False) for _ in range(K))
+        self.K = K
+
+    def forward(self, h, e):
+        z = (h.float() - self.mu) / self.sd
+        return [self.h[k](z) + self.e[k](e.float()) for k in range(self.K)]
+
+
+def ahead_vocab(records: list[SeqRecord], size: int = 4000) -> list[int]:
+    """Most frequent continuation tokens of multi-token words."""
+    cnt = Counter(t for rec in records for u in rec.units if u.kind == "word" and u.n_tokens >= 2 for t in u.ids[1:])
+    return [t for t, _ in cnt.most_common(size)]
+
+
+def ahead_training_data(records: list[SeqRecord], layer: int, vocab: list[int], K: int = 4):
+    """One sample per (word, tokens written j): state, latest token, and the next K tokens."""
+    vid = {t: i for i, t in enumerate(vocab)}
+    stop = len(vocab)
+    X, T, Y = [], [], []
+    for rec in records:
+        for row, ui in enumerate(rec.preword_units):
+            u = rec.units[ui]
+            for j in range(1, u.n_tokens):
+                h = rec.state_for_prefix(layer, row, j)
+                if h is None:
+                    break
+                X.append(h)
+                T.append(u.ids[j - 1])
+                Y.append([vid.get(u.ids[j + k], stop) if j + k < u.n_tokens else stop for k in range(K)])
+    return np.stack(X), np.array(T), np.array(Y)
+
+
+def fit_ahead(X, T, Y, emb: torch.Tensor, n_out: int, epochs: int = 12, lr: float = 2e-3, weight_decay: float = 1e-4,
+              batch_size: int = 1024, seed: int = 0) -> AheadHead:
+    """Convex fit of the K token-ahead heads (the base model and its embeddings stay frozen)."""
+    from .models import pick_device
+
+    torch.manual_seed(seed)
+    dev = pick_device()
+    Xt = torch.from_numpy(X).to(dev)  # float16 on device; cast per batch
+    Tt, Yt = torch.from_numpy(T).long().to(dev), torch.from_numpy(Y).long().to(dev)
+    E = emb.detach().float().to(dev)
+    head = AheadHead(X.shape[1], E.shape[1], n_out, Y.shape[1]).to(dev)
+    sample = Xt[torch.randperm(len(Xt))[:20000].to(dev)].float()
+    head.mu.data, head.sd.data = sample.mean(0), sample.std(0) + 1e-4
+    opt = torch.optim.AdamW([p for p in head.parameters() if p.requires_grad], lr=lr, weight_decay=weight_decay)
+    n = len(Xt)
+    for _ in range(epochs):
+        perm = torch.randperm(n).to(dev)
+        for i in range(0, n, batch_size):
+            b = perm[i : i + batch_size]
+            outs = head(Xt[b], E[Tt[b]])
+            loss = sum(torch.nn.functional.cross_entropy(o, Yt[b, k]) for k, o in enumerate(outs))
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+    return head.cpu().eval()
+
+
+class AheadDrafter:
+    """Drafts the next tokens of the current word with token-ahead heads; no lexicon needed."""
+    name = "head"
+
+    def __init__(self, head: AheadHead, emb: torch.Tensor, vocab: list[int], primary=None):
+        self.head, self.E, self.vocab, self.primary = head, emb.detach().float().cpu(), vocab, primary
+
+    @torch.no_grad()
+    def draft(self, prefix: tuple[int, ...], h=None, h_cur=None) -> list[int]:
+        if self.primary is not None:  # e.g. a lexicon drafter; use the heads only when it has nothing
+            d = self.primary.draft(prefix, h, h_cur)
+            if d:
+                return d
+        feat = h_cur if h_cur is not None else h
+        if feat is None:
+            return []
+        ht = feat.detach().float().cpu() if torch.is_tensor(feat) else torch.from_numpy(np.asarray(feat, dtype=np.float32))
+        outs = self.head(ht[None], self.E[prefix[-1]][None])
+        draft = []
+        for o in outs:
+            i = int(o[0].argmax())
+            if i >= len(self.vocab):
+                break
+            draft.append(self.vocab[i])
+        return draft
 
 
 class OracleDrafter:

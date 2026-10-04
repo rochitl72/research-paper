@@ -96,3 +96,37 @@ def test_patching_identity_and_capture(tiny_lm):
         changed = tiny_lm.model(input_ids=torch.tensor([ids])).logits
     assert torch.allclose(base[0, :p], changed[0, :p], atol=1e-8)
     assert not torch.allclose(base[0, p:], changed[0, p:])
+
+
+def test_ahead_heads_learn_deterministic_spelling():
+    from wordhead.heads import AheadDrafter, ahead_training_data, ahead_vocab, emulated_steps, fit_ahead
+
+    recs = _toy_records()
+    # give every word in-word states: the context signal again (so the state identifies the word)
+    for rec in recs:
+        u = rec.units[1]
+        c = u.n_tokens - 2
+        rec.inword_offset, rec.inword_count = [0], [c]
+        rec.inword_hidden = {3: np.repeat(rec.preword_hidden[3], c, axis=0)}
+    vocab = ahead_vocab(recs)
+    assert {6, 7, 8} <= set(vocab)
+    X, T, Y = ahead_training_data(recs, 3, vocab, K=2)
+    emb = torch.randn(10, 4)
+    head = fit_ahead(X, T, Y, emb, len(vocab), epochs=40, lr=1e-2, batch_size=64)
+    res = emulated_steps(recs, AheadDrafter(head, emb, vocab), layer=3)
+    assert res["whole_word_first_draft"] > 0.95  # (5,6,7) and (5,8) both drafted whole, with a STOP after
+    assert res["acceptance"] > 0.95
+
+
+def test_knockout_mask_is_exact_and_local(tiny_lm):
+    from wordhead.patching import _cont_logp
+
+    ids = tiny_lm.tokenizer("தமிழ்நாடு இந்தியாவின் தெற்கே அமைந்துள்ள", add_special_tokens=False)["input_ids"]
+    s, e = len(ids) - 6, len(ids)
+    with torch.no_grad():
+        lp = torch.log_softmax(tiny_lm.model(input_ids=torch.tensor([ids])).logits[0, s : e - 1], -1)
+    ref = float(lp.gather(-1, torch.tensor(ids[s + 1 : e])[:, None]).sum())
+    base, _ = _cont_logp(tiny_lm, ids, s, e, None)
+    assert abs(base - ref) < 1e-8  # the explicit 4D causal mask reproduces ordinary attention
+    blocked, _ = _cont_logp(tiny_lm, ids, s, e, s - 1)
+    assert abs(blocked - base) > 1e-6  # blocking a context position changes the word's probabilities

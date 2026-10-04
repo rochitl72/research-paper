@@ -13,8 +13,8 @@ import torch
 
 from common import cache_path, env_info, load_records, load_texts, results_dir, start_log, write_json
 
-from wordhead.heads import (DictionaryDrafter, HeadDrafter, Lexicon, OracleDrafter, emulated_steps, fit_head,
-                            head_training_data)
+from wordhead.heads import (AheadDrafter, DictionaryDrafter, HeadDrafter, Lexicon, OracleDrafter, ahead_training_data,
+                            ahead_vocab, emulated_steps, fit_ahead, fit_head, head_training_data)
 from wordhead.models import load
 from wordhead.specdec import generate
 from wordhead.words import Segmenter
@@ -27,6 +27,9 @@ def main():
     ap.add_argument("--lexicon-size", type=int, default=5000)
     ap.add_argument("--dictionary-size", type=int, default=30000)
     ap.add_argument("--epochs", type=int, default=20)
+    ap.add_argument("--ahead-vocab", type=int, default=4000)
+    ap.add_argument("--ahead-k", type=int, default=4)
+    ap.add_argument("--ahead-epochs", type=int, default=12)
     ap.add_argument("--prompts", type=int, default=12)
     ap.add_argument("--prompt-tokens", type=int, default=32)
     ap.add_argument("--new-tokens", type=int, default=64)
@@ -88,6 +91,25 @@ def main():
         e["fit_seconds"], e["n_train"] = time.time() - t0, int(len(y))
         em[f"current_head_L{last}"] = e
         show(f"current-state head L{last}", e)
+        # token-ahead heads (Medusa-style, linear): no lexicon, so no coverage limit
+        emb = lm.model.get_input_embeddings().weight
+        av = ahead_vocab(fit, size=args.ahead_vocab)
+        Xa, Ta, Ya = ahead_training_data(fit, last, av, K=args.ahead_k)
+        t0 = time.time()
+        ahead = fit_ahead(Xa, Ta, Ya, emb, len(av), epochs=args.ahead_epochs)
+        fit_s = time.time() - t0
+        del Xa
+        ahead_only = AheadDrafter(ahead, emb, av)
+        e = emulated_steps(ev, ahead_only, layer=last)
+        e["fit_seconds"], e["n_train"] = fit_s, int(len(Ta))
+        em["ahead_heads"] = e
+        show("token-ahead heads", e)
+        hybrid = AheadDrafter(ahead, emb, av, primary=HeadDrafter(lex, cur_head, mode="current", fallback=dict_big))
+        em["word_head_then_ahead"] = emulated_steps(ev, hybrid, layer=last)
+        show("word head, then ahead", em["word_head_then_ahead"])
+        dict_ahead = AheadDrafter(ahead, emb, av, primary=dict_big)
+        em["dictionary_then_ahead"] = emulated_steps(ev, dict_ahead, layer=last)
+        show("dictionary, then ahead", em["dictionary_then_ahead"])
         best_L = min(heads, key=lambda L: em[f"preword_head_L{L}"]["steps"])
         res["best_layer"] = best_L
         torch.save(cur_head.state_dict(), cache_path(args.model, lang, f"current_head_L{last}").with_suffix(".pt"))
@@ -98,7 +120,8 @@ def main():
         # real decoding reads the final layer (no extra hooks needed)
         drafters = {"plain": None, "dictionary": dict_big,
                     "preword_head": HeadDrafter(lex, heads[last], mode="preword", fallback=dict_big),
-                    "current_head": HeadDrafter(lex, cur_head, mode="current", fallback=dict_big)}
+                    "current_head": HeadDrafter(lex, cur_head, mode="current", fallback=dict_big),
+                    "ahead_heads": ahead_only, "word_head_then_ahead": hybrid}
         dec = {k: [] for k in drafters}
         lossless = True
         for i, t in enumerate(texts):
@@ -124,7 +147,7 @@ def main():
         base = summary["plain"]["seconds"]
         for name in summary:
             summary[name]["wallclock_speedup"] = base / summary[name]["seconds"]
-            print(f"  {name:>14}: {summary[name]['tokens_per_forward']:.2f} tokens/forward, "
+            print(f"  {name:>22}: {summary[name]['tokens_per_forward']:.2f} tokens/forward, "
                   f"acceptance {summary[name]['acceptance']:.1%}, wall-clock x{summary[name]['wallclock_speedup']:.2f}")
         print(f"  lossless (identical to plain greedy on all prompts): {lossless}")
         sample = lm.tokenizer.decode(generate(lm, lm.tokenizer(texts[0], add_special_tokens=False)["input_ids"][: args.prompt_tokens],

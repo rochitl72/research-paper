@@ -1,0 +1,32 @@
+
+===== 02_plan_probe_Qwen3-0.6B-Base | 2026-10-04 10:36:25 | argv: --model Qwen/Qwen3-0.6B-Base --langs ta hi
+
+[ta] classes=1000 groups=6 test n=4515
+  layer   probe  majority  control  chance | model spells misspells
+      0   0.043     0.032    0.020   0.010 |        0.155     0.030
+      7   0.127     0.032    0.015   0.010 |        0.294     0.105
+     14   0.136     0.032    0.015   0.010 |        0.331     0.112
+     21   0.145     0.032    0.015   0.010 |        0.346     0.120
+     28   0.142     0.032    0.017   0.010 |        0.338     0.117
+  word identity as the word unfolds (layer 28): tokens written -> state probe vs prefix-only dictionary
+    1 tokens: state 0.148 | prefix only 0.040 (n=4475, 974 candidate words)
+    2 tokens: state 0.283 | prefix only 0.147 (n=4422, 85 candidate words)
+    3 tokens: state 0.488 | prefix only 0.342 (n=4271, 15 candidate words)
+    4 tokens: state 0.603 | prefix only 0.485 (n=3825, 7 candidate words)
+    5 tokens: state 0.690 | prefix only 0.623 (n=3411, 4 candidate words)
+    6 tokens: state 0.753 | prefix only 0.722 (n=2798, 3 candidate words)
+
+[hi] classes=1000 groups=10 test n=16370
+  layer   probe  majority  control  chance | model spells misspells
+      0   0.230     0.244    0.193   0.012 |        0.448     0.067
+      7   0.348     0.244    0.141   0.012 |        0.597     0.162
+     14   0.363     0.244    0.145   0.012 |        0.631     0.163
+     21   0.395     0.244    0.148   0.012 |        0.686     0.178
+     28   0.398     0.244    0.151   0.012 |        0.692     0.178
+  word identity as the word unfolds (layer 28): tokens written -> state probe vs prefix-only dictionary
+    1 tokens: state 0.399 | prefix only 0.245 (n=15394, 321 candidate words)
+    2 tokens: state 0.644 | prefix only 0.412 (n=12854, 21 candidate words)
+    3 tokens: state 0.770 | prefix only 0.613 (n=8688, 5 candidate words)
+    4 tokens: state 0.840 | prefix only 0.751 (n=5972, 3 candidate words)
+    5 tokens: state 0.918 | prefix only 0.870 (n=3626, 2 candidate words)
+    6 tokens: state 0.955 | prefix only 0.937 (n=2296, 1 candidate words)

@@ -1,0 +1,1120 @@
+{
+  "ta": {
+    "n_words": 39754,
+    "n_word_tokens": 381363,
+    "n_cont_tokens": 341609,
+    "tokens_per_word": 9.593072395230669,
+    "cont_share_of_word_tokens": 0.8957581097274775,
+    "spelling_share@0.5": 0.46387824723426235,
+    "cont_deterministic@0.5": 0.5178610633794777,
+    "spelling_share@0.9": 0.2757110679326521,
+    "cont_deterministic@0.9": 0.3077963402603561,
+    "spelling_share@0.99": 0.12404716765915938,
+    "cont_deterministic@0.99": 0.13848288540407308,
+    "cont_greedy_correct": 0.6313065522278394,
+    "bits_first_per_word": 1.2074719374732863,
+    "bits_cont_per_word": 14.399619869149312,
+    "share_bits_in_first_token": 0.07736687606085053,
+    "boundary_counts": {
+      "byte": 122526,
+      "subword": 125853,
+      "grapheme": 93230
+    },
+    "boundary_share_of_cont": {
+      "byte": 0.358673219967858,
+      "subword": 0.3684124247311985,
+      "grapheme": 0.2729143553009435
+    },
+    "boundary_deterministic@0.9": {
+      "byte": 0.4034000946737835,
+      "subword": 0.17390924332356003,
+      "grapheme": 0.3628874825699882
+    },
+    "share_words_multitoken": 0.9637772299642803,
+    "by_length": {
+      "2": {
+        "n": 656,
+        "cont_det": 0.1676829268292683,
+        "share_bits_first": 0.6349556608356993
+      },
+      "3": {
+        "n": 775,
+        "cont_det": 0.14258064516129032,
+        "share_bits_first": 0.3531016110892125
+      },
+      "4": {
+        "n": 1846,
+        "cont_det": 0.13542795232936078,
+        "share_bits_first": 0.15900890969874495
+      },
+      "5": {
+        "n": 2050,
+        "cont_det": 0.17256097560975608,
+        "share_bits_first": 0.10343673207968075
+      },
+      "6": {
+        "n": 2934,
+        "cont_det": 0.2118609406952965,
+        "share_bits_first": 0.07869067325195792
+      },
+      "7": {
+        "n": 3490,
+        "cont_det": 0.24259789875835722,
+        "share_bits_first": 0.07471410374621833
+      },
+      "8": {
+        "n": 4013,
+        "cont_det": 0.2909828770780677,
+        "share_bits_first": 0.06135628410645343
+      },
+      "9": {
+        "n": 3723,
+        "cont_det": 0.26809696481332257,
+        "share_bits_first": 0.055652083020442784
+      },
+      "10": {
+        "n": 3646,
+        "cont_det": 0.2898457975254465,
+        "share_bits_first": 0.051464696823079276
+      },
+      "11": {
+        "n": 3100,
+        "cont_det": 0.29480645161290325,
+        "share_bits_first": 0.04769106772689098
+      },
+      "12": {
+        "n": 12081,
+        "cont_det": 0.35430550111067555,
+        "share_bits_first": 0.03368374981823698
+      }
+    },
+    "freq_matched": [
+      {
+        "freq_bin": 1,
+        "n_tokens": 2,
+        "n": 251,
+        "cont_det": 0.1593625498007968
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 3,
+        "n": 146,
+        "cont_det": 0.1815068493150685
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 4,
+        "n": 134,
+        "cont_det": 0.0945273631840796
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 5,
+        "n": 233,
+        "cont_det": 0.1223175965665236
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 6,
+        "n": 342,
+        "cont_det": 0.10058479532163743
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 7,
+        "n": 579,
+        "cont_det": 0.13212435233160622
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 8,
+        "n": 750,
+        "cont_det": 0.1478095238095238
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 9,
+        "n": 1093,
+        "cont_det": 0.17920860018298262
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 10,
+        "n": 1148,
+        "cont_det": 0.21080139372822299
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 11,
+        "n": 1238,
+        "cont_det": 0.22625201938610662
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 12,
+        "n": 7255,
+        "cont_det": 0.321790532487963
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 2,
+        "n": 74,
+        "cont_det": 0.21621621621621623
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 3,
+        "n": 95,
+        "cont_det": 0.09473684210526316
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 4,
+        "n": 149,
+        "cont_det": 0.06487695749440715
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 5,
+        "n": 280,
+        "cont_det": 0.13839285714285715
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 6,
+        "n": 478,
+        "cont_det": 0.1397489539748954
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 7,
+        "n": 711,
+        "cont_det": 0.17112048757618378
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 8,
+        "n": 892,
+        "cont_det": 0.22053171044202435
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 9,
+        "n": 980,
+        "cont_det": 0.24642857142857144
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 10,
+        "n": 982,
+        "cont_det": 0.2811722109074451
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 11,
+        "n": 1040,
+        "cont_det": 0.29951923076923076
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 12,
+        "n": 3064,
+        "cont_det": 0.3842790493172769
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 2,
+        "n": 184,
+        "cont_det": 0.13043478260869565
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 3,
+        "n": 130,
+        "cont_det": 0.07692307692307693
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 4,
+        "n": 327,
+        "cont_det": 0.0652395514780836
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 5,
+        "n": 659,
+        "cont_det": 0.13353566009104703
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 6,
+        "n": 843,
+        "cont_det": 0.16915776986951364
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 7,
+        "n": 953,
+        "cont_det": 0.2373207415180133
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 8,
+        "n": 1266,
+        "cont_det": 0.29203340103814035
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 9,
+        "n": 1112,
+        "cont_det": 0.30137140287769787
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 10,
+        "n": 1077,
+        "cont_det": 0.32136593417930465
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 11,
+        "n": 675,
+        "cont_det": 0.37451851851851853
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 12,
+        "n": 1456,
+        "cont_det": 0.43734153314991636
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 2,
+        "n": 147,
+        "cont_det": 0.20408163265306123
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 3,
+        "n": 404,
+        "cont_det": 0.1608910891089109
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 4,
+        "n": 1236,
+        "cont_det": 0.1669363538295577
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 5,
+        "n": 878,
+        "cont_det": 0.22608200455580865
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 6,
+        "n": 1271,
+        "cont_det": 0.2972462627852085
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 7,
+        "n": 1247,
+        "cont_det": 0.338679497460572
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 8,
+        "n": 1105,
+        "cont_det": 0.4438267614738203
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 9,
+        "n": 538,
+        "cont_det": 0.41937732342007433
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 10,
+        "n": 439,
+        "cont_det": 0.4386231333839534
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 11,
+        "n": 147,
+        "cont_det": 0.47278911564625853
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 12,
+        "n": 306,
+        "cont_det": 0.5151061173533084
+      }
+    ],
+    "by_position": [
+      {
+        "position": 0,
+        "n": 38314,
+        "bits": 0.9946380148076397,
+        "greedy_correct": null
+      },
+      {
+        "position": 1,
+        "n": 38314,
+        "bits": 3.265835861799269,
+        "greedy_correct": 0.28146369473299576
+      },
+      {
+        "position": 2,
+        "n": 37658,
+        "bits": 2.6447165085449864,
+        "greedy_correct": 0.42224759679218227
+      },
+      {
+        "position": 3,
+        "n": 36883,
+        "bits": 1.6056972112119816,
+        "greedy_correct": 0.6380988531301683
+      },
+      {
+        "position": 4,
+        "n": 35037,
+        "bits": 1.3783915517931586,
+        "greedy_correct": 0.6997459828181637
+      },
+      {
+        "position": 5,
+        "n": 32987,
+        "bits": 1.370065227485147,
+        "greedy_correct": 0.7062479158456362
+      },
+      {
+        "position": 6,
+        "n": 30053,
+        "bits": 1.250374641767872,
+        "greedy_correct": 0.7269490566665557
+      },
+      {
+        "position": 7,
+        "n": 26563,
+        "bits": 1.2996677564694943,
+        "greedy_correct": 0.7169370929488386
+      },
+      {
+        "position": 8,
+        "n": 22550,
+        "bits": 1.2961170074928334,
+        "greedy_correct": 0.7154323725055433
+      },
+      {
+        "position": 9,
+        "n": 18827,
+        "bits": 1.280308027267313,
+        "greedy_correct": 0.7210920486535295
+      },
+      {
+        "position": 10,
+        "n": 15181,
+        "bits": 1.1841456727018316,
+        "greedy_correct": 0.7296620775969962
+      },
+      {
+        "position": 11,
+        "n": 12081,
+        "bits": 1.135281849760016,
+        "greedy_correct": 0.7472063570896449
+      },
+      {
+        "position": 12,
+        "n": 9654,
+        "bits": 1.0957871797922882,
+        "greedy_correct": 0.7477729438574684
+      },
+      {
+        "position": 13,
+        "n": 7344,
+        "bits": 1.1571169675570225,
+        "greedy_correct": 0.7380174291938998
+      },
+      {
+        "position": 14,
+        "n": 5599,
+        "bits": 1.0733911635647753,
+        "greedy_correct": 0.758885515270584
+      },
+      {
+        "position": 15,
+        "n": 3991,
+        "bits": 1.0645429960934516,
+        "greedy_correct": 0.7647206213981458
+      }
+    ]
+  },
+  "hi": {
+    "n_words": 74842,
+    "n_word_tokens": 360962,
+    "n_cont_tokens": 286120,
+    "tokens_per_word": 4.822987092808851,
+    "cont_share_of_word_tokens": 0.7926596151395437,
+    "spelling_share@0.5": 0.43679944149245625,
+    "cont_deterministic@0.5": 0.5510555011883126,
+    "spelling_share@0.9": 0.28519899601620113,
+    "cont_deterministic@0.9": 0.35980008388088913,
+    "spelling_share@0.99": 0.1424859126445443,
+    "cont_deterministic@0.99": 0.17975674542150147,
+    "cont_greedy_correct": 0.6560324339437998,
+    "bits_first_per_word": 2.1649430952879714,
+    "bits_cont_per_word": 6.545448333525492,
+    "share_bits_in_first_token": 0.24854716495592455,
+    "boundary_counts": {
+      "grapheme": 108175,
+      "subword": 77337,
+      "byte": 100608
+    },
+    "boundary_share_of_cont": {
+      "grapheme": 0.37807563260170557,
+      "subword": 0.2702956801342094,
+      "byte": 0.351628687264085
+    },
+    "boundary_deterministic@0.9": {
+      "grapheme": 0.3484169170325861,
+      "subword": 0.3415312205024762,
+      "byte": 0.3860826176844784
+    },
+    "share_words_multitoken": 0.9891237540418482,
+    "by_length": {
+      "2": {
+        "n": 11771,
+        "cont_det": 0.12377877835358084,
+        "share_bits_first": 0.5536083413237021
+      },
+      "3": {
+        "n": 14795,
+        "cont_det": 0.48999662047989184,
+        "share_bits_first": 0.4316598611508691
+      },
+      "4": {
+        "n": 10410,
+        "cont_det": 0.3442203009926353,
+        "share_bits_first": 0.28279146528834914
+      },
+      "5": {
+        "n": 11240,
+        "cont_det": 0.29942170818505337,
+        "share_bits_first": 0.21424930470075446
+      },
+      "6": {
+        "n": 8726,
+        "cont_det": 0.3388494155397662,
+        "share_bits_first": 0.20264960269523236
+      },
+      "7": {
+        "n": 6943,
+        "cont_det": 0.37632627586538,
+        "share_bits_first": 0.16561832271463078
+      },
+      "8": {
+        "n": 4297,
+        "cont_det": 0.37288473685960305,
+        "share_bits_first": 0.14752047060756163
+      },
+      "9": {
+        "n": 2759,
+        "cont_det": 0.3921257702065966,
+        "share_bits_first": 0.12977569413051215
+      },
+      "10": {
+        "n": 1347,
+        "cont_det": 0.3608842695702384,
+        "share_bits_first": 0.11774187365150826
+      },
+      "11": {
+        "n": 896,
+        "cont_det": 0.45792410714285714,
+        "share_bits_first": 0.11422264896837948
+      },
+      "12": {
+        "n": 844,
+        "cont_det": 0.3949437643077536,
+        "share_bits_first": 0.08747445517774498
+      }
+    },
+    "freq_matched": [
+      {
+        "freq_bin": 0,
+        "n_tokens": 2,
+        "n": 338,
+        "cont_det": 0.14792899408284024
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 3,
+        "n": 603,
+        "cont_det": 0.10033167495854063
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 4,
+        "n": 1386,
+        "cont_det": 0.10485810485810486
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 5,
+        "n": 2209,
+        "cont_det": 0.13433680398370304
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 6,
+        "n": 2553,
+        "cont_det": 0.18284371327849588
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 7,
+        "n": 2246,
+        "cont_det": 0.2186850697536361
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 8,
+        "n": 1725,
+        "cont_det": 0.2477846790890269
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 9,
+        "n": 1361,
+        "cont_det": 0.2816862601028655
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 10,
+        "n": 849,
+        "cont_det": 0.281900274833137
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 11,
+        "n": 491,
+        "cont_det": 0.3270875763747454
+      },
+      {
+        "freq_bin": 0,
+        "n_tokens": 12,
+        "n": 600,
+        "cont_det": 0.31799221357063406
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 2,
+        "n": 350,
+        "cont_det": 0.1742857142857143
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 3,
+        "n": 921,
+        "cont_det": 0.11237785016286644
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 4,
+        "n": 2055,
+        "cont_det": 0.2194647201946472
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 5,
+        "n": 3133,
+        "cont_det": 0.250957548675391
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 6,
+        "n": 3123,
+        "cont_det": 0.3408261287223823
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 7,
+        "n": 2262,
+        "cont_det": 0.38012083701738875
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 8,
+        "n": 1540,
+        "cont_det": 0.41410018552875694
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 9,
+        "n": 861,
+        "cont_det": 0.4880952380952381
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 10,
+        "n": 292,
+        "cont_det": 0.4684170471841705
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 11,
+        "n": 207,
+        "cont_det": 0.5357487922705314
+      },
+      {
+        "freq_bin": 1,
+        "n_tokens": 12,
+        "n": 159,
+        "cont_det": 0.5396739130434782
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 2,
+        "n": 388,
+        "cont_det": 0.06701030927835051
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 3,
+        "n": 2082,
+        "cont_det": 0.2154178674351585
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 4,
+        "n": 3151,
+        "cont_det": 0.30117423040304664
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 5,
+        "n": 3450,
+        "cont_det": 0.3446376811594203
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 6,
+        "n": 2335,
+        "cont_det": 0.4411134903640257
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 7,
+        "n": 1867,
+        "cont_det": 0.496429209069809
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 8,
+        "n": 846,
+        "cont_det": 0.5096251266464032
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 9,
+        "n": 537,
+        "cont_det": 0.5181564245810056
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 10,
+        "n": 206,
+        "cont_det": 0.5339805825242718
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 11,
+        "n": 198,
+        "cont_det": 0.701010101010101
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 12,
+        "n": 85,
+        "cont_det": 0.677832512315271
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 2,
+        "n": 2629,
+        "cont_det": 0.22327881323697224
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 3,
+        "n": 3777,
+        "cont_det": 0.24530050304474452
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 4,
+        "n": 3818,
+        "cont_det": 0.533787323205867
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 5,
+        "n": 2448,
+        "cont_det": 0.44669117647058826
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 6,
+        "n": 715,
+        "cont_det": 0.5532867132867133
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 7,
+        "n": 568,
+        "cont_det": 0.5897887323943662
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 8,
+        "n": 186,
+        "cont_det": 0.5698924731182796
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 2,
+        "n": 8066,
+        "cont_det": 0.09087527894867345
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 3,
+        "n": 7412,
+        "cont_det": 0.7704398273070696
+      }
+    ],
+    "by_position": [
+      {
+        "position": 0,
+        "n": 74028,
+        "bits": 2.113814278646919,
+        "greedy_correct": null
+      },
+      {
+        "position": 1,
+        "n": 74028,
+        "bits": 2.8418783669264336,
+        "greedy_correct": 0.4260685146160912
+      },
+      {
+        "position": 2,
+        "n": 62257,
+        "bits": 1.755684349915077,
+        "greedy_correct": 0.6426586568578634
+      },
+      {
+        "position": 3,
+        "n": 47462,
+        "bits": 1.3454595766743658,
+        "greedy_correct": 0.7284353798828537
+      },
+      {
+        "position": 4,
+        "n": 37052,
+        "bits": 1.1154973301918756,
+        "greedy_correct": 0.7725089064018137
+      },
+      {
+        "position": 5,
+        "n": 25812,
+        "bits": 1.0023941810794592,
+        "greedy_correct": 0.8075313807531381
+      },
+      {
+        "position": 6,
+        "n": 17086,
+        "bits": 0.9901240300774887,
+        "greedy_correct": 0.8120683600608686
+      },
+      {
+        "position": 7,
+        "n": 10143,
+        "bits": 1.0247203127589533,
+        "greedy_correct": 0.8043971211673075
+      },
+      {
+        "position": 8,
+        "n": 5846,
+        "bits": 0.959505368468882,
+        "greedy_correct": 0.8202189531303455
+      },
+      {
+        "position": 9,
+        "n": 3087,
+        "bits": 0.975496079737775,
+        "greedy_correct": 0.8221574344023324
+      },
+      {
+        "position": 10,
+        "n": 1740,
+        "bits": 0.8516303743557004,
+        "greedy_correct": 0.8333333333333334
+      },
+      {
+        "position": 11,
+        "n": 844,
+        "bits": 0.9810794716662152,
+        "greedy_correct": 0.8317535545023697
+      },
+      {
+        "position": 12,
+        "n": 413,
+        "bits": 1.1096441578845517,
+        "greedy_correct": 0.8038740920096852
+      },
+      {
+        "position": 13,
+        "n": 192,
+        "bits": 1.0954466396894074,
+        "greedy_correct": 0.7604166666666666
+      },
+      {
+        "position": 14,
+        "n": 86,
+        "bits": 1.337621425005147,
+        "greedy_correct": 0.7325581395348837
+      },
+      {
+        "position": 15,
+        "n": 37,
+        "bits": 1.2818314675804894,
+        "greedy_correct": 0.7837837837837838
+      }
+    ]
+  },
+  "en": {
+    "n_words": 95672,
+    "n_word_tokens": 108617,
+    "n_cont_tokens": 12945,
+    "tokens_per_word": 1.1353060456559914,
+    "cont_share_of_word_tokens": 0.11918023882081073,
+    "spelling_share@0.5": 0.07494222819632286,
+    "cont_deterministic@0.5": 0.6288142139822325,
+    "spelling_share@0.9": 0.05234907979413904,
+    "cont_deterministic@0.9": 0.43924295094631133,
+    "spelling_share@0.99": 0.02621136654483184,
+    "cont_deterministic@0.99": 0.21993047508690614,
+    "cont_greedy_correct": 0.705909617612978,
+    "bits_first_per_word": 5.14902648627536,
+    "bits_cont_per_word": 0.28851694820876944,
+    "share_bits_in_first_token": 0.9469398356656729,
+    "boundary_counts": {
+      "subword": 12892,
+      "byte": 47,
+      "grapheme": 6
+    },
+    "boundary_share_of_cont": {
+      "subword": 0.9959057551178061,
+      "byte": 0.003630745461568173,
+      "grapheme": 0.0004634994206257242
+    },
+    "boundary_deterministic@0.9": {
+      "subword": 0.44066087496121625,
+      "byte": 0.0851063829787234,
+      "grapheme": 0.16666666666666666
+    },
+    "share_words_multitoken": 0.09285893469353625,
+    "by_length": {
+      "2": {
+        "n": 5762,
+        "cont_det": 0.4501909059354391,
+        "share_bits_first": 0.8255886297330927
+      },
+      "3": {
+        "n": 2389,
+        "cont_det": 0.44202595228128927,
+        "share_bits_first": 0.658177832650825
+      },
+      "4": {
+        "n": 587,
+        "cont_det": 0.45201590005678594,
+        "share_bits_first": 0.5329204239524681
+      },
+      "5": {
+        "n": 110,
+        "cont_det": 0.32954545454545453,
+        "share_bits_first": 0.4080561786583636
+      },
+      "6": {
+        "n": 25,
+        "cont_det": 0.152,
+        "share_bits_first": 0.340308056179883
+      },
+      "7": {
+        "n": 6,
+        "cont_det": 0.3611111111111111,
+        "share_bits_first": 0.2878983409630475
+      },
+      "9": {
+        "n": 3,
+        "cont_det": 0.041666666666666664,
+        "share_bits_first": 0.1726172574981763
+      },
+      "10": {
+        "n": 1,
+        "cont_det": 0.2222222222222222,
+        "share_bits_first": 0.31375246568394066
+      },
+      "11": {
+        "n": 1,
+        "cont_det": 0.4,
+        "share_bits_first": 0.4726768044998605
+      }
+    },
+    "freq_matched": [
+      {
+        "freq_bin": 2,
+        "n_tokens": 2,
+        "n": 2723,
+        "cont_det": 0.3606316562614763
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 3,
+        "n": 1201,
+        "cont_det": 0.3376353039134055
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 4,
+        "n": 330,
+        "cont_det": 0.30606060606060603
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 5,
+        "n": 66,
+        "cont_det": 0.22348484848484848
+      },
+      {
+        "freq_bin": 2,
+        "n_tokens": 6,
+        "n": 21,
+        "cont_det": 0.18095238095238095
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 2,
+        "n": 1778,
+        "cont_det": 0.49887514060742405
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 3,
+        "n": 734,
+        "cont_det": 0.5054495912806539
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 4,
+        "n": 174,
+        "cont_det": 0.5651340996168582
+      },
+      {
+        "freq_bin": 3,
+        "n_tokens": 5,
+        "n": 44,
+        "cont_det": 0.48863636363636365
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 2,
+        "n": 1261,
+        "cont_det": 0.5749405233941316
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 3,
+        "n": 454,
+        "cont_det": 0.6156387665198237
+      },
+      {
+        "freq_bin": 4,
+        "n_tokens": 4,
+        "n": 83,
+        "cont_det": 0.7951807228915663
+      }
+    ],
+    "by_position": [
+      {
+        "position": 0,
+        "n": 8884,
+        "bits": 8.665208956414387,
+        "greedy_correct": null
+      },
+      {
+        "position": 1,
+        "n": 8884,
+        "bits": 2.307173219975442,
+        "greedy_correct": 0.6804367402071139
+      },
+      {
+        "position": 2,
+        "n": 3122,
+        "bits": 1.6448224868945982,
+        "greedy_correct": 0.7789878283151825
+      },
+      {
+        "position": 3,
+        "n": 733,
+        "bits": 1.9684665691048886,
+        "greedy_correct": 0.723055934515689
+      },
+      {
+        "position": 4,
+        "n": 146,
+        "bits": 2.670859747342547,
+        "greedy_correct": 0.6575342465753424
+      },
+      {
+        "position": 5,
+        "n": 36,
+        "bits": 2.178763106798866,
+        "greedy_correct": 0.5833333333333334
+      },
+      {
+        "position": 6,
+        "n": 11,
+        "bits": 2.8206351726093013,
+        "greedy_correct": 0.6363636363636364
+      },
+      {
+        "position": 7,
+        "n": 5,
+        "bits": 2.8577122161699475,
+        "greedy_correct": 0.4
+      },
+      {
+        "position": 8,
+        "n": 5,
+        "bits": 2.0540289615030662,
+        "greedy_correct": 0.6
+      },
+      {
+        "position": 9,
+        "n": 2,
+        "bits": 1.769993869382599,
+        "greedy_correct": 0.5
+      },
+      {
+        "position": 10,
+        "n": 1,
+        "bits": 0.5381080461390869,
+        "greedy_correct": 1.0
+      }
+    ]
+  }
+}

@@ -100,7 +100,7 @@ def fig_probe(model):
         ax.set_ylim(0, 1)
     axes[0][0].set_ylabel("Accuracy picking the upcoming word")
     axes[0][-1].legend(fontsize=8, loc="upper left")
-    fig.suptitle(f"The upcoming word is linearly readable before any of it is written ({slug(model)})", x=0.02, ha="left",
+    fig.suptitle(f"The upcoming word is partly readable before any of it is written ({slug(model)})", x=0.02, ha="left",
                  fontweight="bold", fontsize=11)
     fig.tight_layout()
     save(fig, model, "fig3_plan_probe_by_layer")
@@ -119,7 +119,7 @@ def fig_probe(model):
             ax.set_ylim(0, 1.02)
         axes[0][0].set_ylabel("Accuracy identifying the whole word")
         axes[0][0].legend(fontsize=8, loc="lower right")
-        fig.suptitle(f"The model knows the word before the spelling gives it away ({slug(model)})", x=0.02, ha="left",
+        fig.suptitle(f"The model's state identifies the word earlier than the written prefix does ({slug(model)})", x=0.02, ha="left",
                      fontweight="bold", fontsize=11)
         fig.tight_layout()
         save(fig, model, "fig4_word_identity_as_word_unfolds")
@@ -142,7 +142,7 @@ def fig_patching(model):
         ax.set_xlabel("Layer patched")
     axes[0][0].set_ylabel("Shift toward the donor word\n(0 = none, 1 = full)")
     axes[0][0].legend(fontsize=8)
-    fig.suptitle(f"Where the choice of word is causally stored ({slug(model)})", x=0.02, ha="left", fontweight="bold", fontsize=11)
+    fig.suptitle(f"Swapping the pre-word state barely changes which word is written ({slug(model)})", x=0.02, ha="left", fontweight="bold", fontsize=11)
     fig.tight_layout()
     save(fig, model, "fig5_patching")
 
@@ -154,13 +154,17 @@ def fig_decoding(model):
     langs = [l for l in ("ta", "hi", "en") if l in d]
     last = None
     rows = [("oracle", "Upper bound (model's own greedy)", INK2), ("dictionary", "Dictionary (context-blind)", ORANGE)]
-    fig, axes = plt.subplots(1, len(langs), figsize=(4.6 * len(langs), 3.4), sharex=True, squeeze=False)
+    fig, axes = plt.subplots(1, len(langs), figsize=(4.6 * len(langs), 3.9), sharex=True, squeeze=False)
     for ax, l in zip(axes[0], langs):
         em = d[l]["emulation"]
         pre = sorted((k for k in em if k.startswith("preword_head_L")), key=lambda k: int(k.split("L")[-1]))[-1]
         cur = [k for k in em if k.startswith("current_head_L")][0]
         items = [("Dictionary (context-blind)", em["dictionary"], ORANGE), ("Word head, pre-word state", em[pre], AQUA),
-                 ("Word head, current state", em[cur], BLUE), ("Upper bound", em["oracle"], INK2)]
+                 ("Word head, current state", em[cur], BLUE)]
+        if "ahead_heads" in em:
+            items += [("Token-ahead heads", em["ahead_heads"], YELLOW),
+                      ("Word head, then token-ahead", em["word_head_then_ahead"], BLUE)]
+        items.append(("Upper bound (always right)", em["oracle"], INK2))
         ax.grid(axis="y", visible=False)
         for i, (lab, e, col) in enumerate(items):
             ax.barh(i, e["step_reduction"], color=col, height=0.55)

@@ -85,6 +85,7 @@ class Tee:
     def write(self, s):
         self.out.write(s)
         self.f.write(s)
+        self.flush()
 
     def flush(self):
         self.out.flush()
