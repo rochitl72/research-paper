@@ -6,3 +6,11 @@ cache/
 *.npz
 *.pt
 !results/**/*.json
+
+# LaTeX build intermediates
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.bbl
+paper/*.out
+paper/*.synctex.gz
