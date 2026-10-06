@@ -1,0 +1,35 @@
+
+===== 01_spelling_share_Qwen3-1.7B-Base | 2026-10-05 05:07:10 | argv: --model Qwen/Qwen3-1.7B-Base
+
+[ta] words=39754  tokens/word=9.59  multi-token words=96.4%
+  continuation tokens = 89.6% of word tokens
+  spelling share @p>=0.5: 53.5% of word tokens (59.8% of continuations)
+  spelling share @p>=0.9: 35.1% of word tokens (39.2% of continuations)
+  spelling share @p>=0.99: 19.0% of word tokens (21.2% of continuations)
+  greedy predicts continuation: 69.0%
+  bits/word: first token 1.08, continuation 12.05 -> 8.2% of word information is in the first token
+  boundary mix: {'byte': '35.9%', 'subword': '36.8%', 'grapheme': '27.3%'}
+  deterministic@0.9 by boundary: {'byte': '46.6%', 'subword': '28.1%', 'grapheme': '44.5%'}
+  bits by token position in word: 0.90 3.07 2.31 1.33 1.10 1.10 0.96 0.98 1.01 0.97 0.90 0.87
+
+[hi] words=74842  tokens/word=4.82  multi-token words=98.9%
+  continuation tokens = 79.3% of word tokens
+  spelling share @p>=0.5: 50.1% of word tokens (63.2% of continuations)
+  spelling share @p>=0.9: 35.9% of word tokens (45.3% of continuations)
+  spelling share @p>=0.99: 21.1% of word tokens (26.6% of continuations)
+  greedy predicts continuation: 71.7%
+  bits/word: first token 1.95, continuation 5.35 -> 26.7% of word information is in the first token
+  boundary mix: {'grapheme': '37.8%', 'subword': '27.0%', 'byte': '35.2%'}
+  deterministic@0.9 by boundary: {'grapheme': '44.8%', 'subword': '45.0%', 'byte': '45.9%'}
+  bits by token position in word: 1.91 2.52 1.43 1.03 0.83 0.73 0.68 0.70 0.63 0.63 0.61 0.60
+
+[en] words=95672  tokens/word=1.14  multi-token words=9.3%
+  continuation tokens = 11.9% of word tokens
+  spelling share @p>=0.5: 8.5% of word tokens (71.7% of continuations)
+  spelling share @p>=0.9: 6.3% of word tokens (53.3% of continuations)
+  spelling share @p>=0.99: 3.7% of word tokens (30.9% of continuations)
+  greedy predicts continuation: 77.8%
+  bits/word: first token 4.68, continuation 0.20 -> 95.8% of word information is in the first token
+  boundary mix: {'subword': '99.6%', 'byte': '0.4%', 'grapheme': '0.0%'}
+  deterministic@0.9 by boundary: {'subword': '53.4%', 'byte': '19.1%', 'grapheme': '16.7%'}
+  bits by token position in word: 7.52 1.69 1.08 1.20 1.62 0.99 3.00 1.58 1.67 2.18 0.00

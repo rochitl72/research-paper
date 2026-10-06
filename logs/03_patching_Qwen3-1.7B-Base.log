@@ -1,0 +1,72 @@
+
+===== 03_patching_Qwen3-1.7B-Base | 2026-10-05 06:22:46 | argv: --model Qwen/Qwen3-1.7B-Base --dtype float32 --langs ta hi --pairs 50 --min-conf 0.3
+[ta] 50 pairs
+  patching preword 1/50  patching preword 2/50  patching preword 3/50  patching preword 4/50  patching preword 5/50  patching preword 6/50  patching preword 7/50  patching preword 8/50  patching preword 9/50  patching preword 10/50  patching preword 11/50  patching preword 12/50  patching preword 13/50  patching preword 14/50  patching preword 15/50  patching preword 16/50  patching preword 17/50  patching preword 18/50  patching preword 19/50  patching preword 20/50  patching preword 21/50  patching preword 22/50  patching preword 23/50  patching preword 24/50  patching preword 25/50  patching preword 26/50  patching preword 27/50  patching preword 28/50  patching preword 29/50  patching preword 30/50  patching preword 31/50  patching preword 32/50  patching preword 33/50  patching preword 34/50  patching preword 35/50  patching preword 36/50  patching preword 37/50  patching preword 38/50  patching preword 39/50  patching preword 40/50  patching preword 41/50  patching preword 42/50  patching preword 43/50  patching preword 44/50  patching preword 45/50  patching preword 46/50  patching preword 47/50  patching preword 48/50  patching preword 49/50  patching preword 50/50
+  preword: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.00 | 0%
+    L 2: +0.02 | 0%
+    L 4: +0.03 | 4%
+    L 6: +0.02 | 0%
+    L 8: +0.06 | 2%
+    L10: +0.09 | 2%
+    L12: +0.08 | 2%
+    L14: +0.08 | 2%
+    L16: +0.08 | 2%
+    L18: +0.07 | 2%
+    L20: +0.06 | 2%
+    L22: +0.05 | 2%
+    L24: +0.02 | 2%
+    L26: +0.01 | 2%
+    L28: +0.00 | 0%
+  patching first_token 1/50  patching first_token 2/50  patching first_token 3/50  patching first_token 4/50  patching first_token 5/50  patching first_token 6/50  patching first_token 7/50  patching first_token 8/50  patching first_token 9/50  patching first_token 10/50  patching first_token 11/50  patching first_token 12/50  patching first_token 13/50  patching first_token 14/50  patching first_token 15/50  patching first_token 16/50  patching first_token 17/50  patching first_token 18/50  patching first_token 19/50  patching first_token 20/50  patching first_token 21/50  patching first_token 22/50  patching first_token 23/50  patching first_token 24/50  patching first_token 25/50  patching first_token 26/50  patching first_token 27/50  patching first_token 28/50  patching first_token 29/50  patching first_token 30/50  patching first_token 31/50  patching first_token 32/50  patching first_token 33/50  patching first_token 34/50  patching first_token 35/50  patching first_token 36/50  patching first_token 37/50  patching first_token 38/50  patching first_token 39/50  patching first_token 40/50  patching first_token 41/50  patching first_token 42/50  patching first_token 43/50  patching first_token 44/50  patching first_token 45/50  patching first_token 46/50  patching first_token 47/50  patching first_token 48/50  patching first_token 49/50  patching first_token 50/50
+  first_token: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.00 | 0%
+    L 2: +0.00 | 0%
+    L 4: +0.03 | 0%
+    L 6: +0.08 | 6%
+    L 8: +0.09 | 4%
+    L10: +0.13 | 8%
+    L12: +0.19 | 8%
+    L14: +0.21 | 12%
+    L16: +0.23 | 14%
+    L18: +0.42 | 24%
+    L20: +0.67 | 34%
+    L22: +0.86 | 40%
+    L24: +0.96 | 44%
+    L26: +0.99 | 44%
+    L28: +1.00 | 42%
+[hi] 50 pairs
+  patching preword 1/50  patching preword 2/50  patching preword 3/50  patching preword 4/50  patching preword 5/50  patching preword 6/50  patching preword 7/50  patching preword 8/50  patching preword 9/50  patching preword 10/50  patching preword 11/50  patching preword 12/50  patching preword 13/50  patching preword 14/50  patching preword 15/50  patching preword 16/50  patching preword 17/50  patching preword 18/50  patching preword 19/50  patching preword 20/50  patching preword 21/50  patching preword 22/50  patching preword 23/50  patching preword 24/50  patching preword 25/50  patching preword 26/50  patching preword 27/50  patching preword 28/50  patching preword 29/50  patching preword 30/50  patching preword 31/50  patching preword 32/50  patching preword 33/50  patching preword 34/50  patching preword 35/50  patching preword 36/50  patching preword 37/50  patching preword 38/50  patching preword 39/50  patching preword 40/50  patching preword 41/50  patching preword 42/50  patching preword 43/50  patching preword 44/50  patching preword 45/50  patching preword 46/50  patching preword 47/50  patching preword 48/50  patching preword 49/50  patching preword 50/50
+  preword: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.09 | 2%
+    L 2: +0.10 | 2%
+    L 4: +0.11 | 4%
+    L 6: +0.17 | 2%
+    L 8: +0.17 | 4%
+    L10: +0.15 | 2%
+    L12: +0.16 | 2%
+    L14: +0.18 | 2%
+    L16: +0.15 | 2%
+    L18: +0.15 | 2%
+    L20: +0.13 | 2%
+    L22: +0.10 | 0%
+    L24: +0.02 | 0%
+    L26: +0.01 | 0%
+    L28: +0.00 | 0%
+  patching first_token 1/50  patching first_token 2/50  patching first_token 3/50  patching first_token 4/50  patching first_token 5/50  patching first_token 6/50  patching first_token 7/50  patching first_token 8/50  patching first_token 9/50  patching first_token 10/50  patching first_token 11/50  patching first_token 12/50  patching first_token 13/50  patching first_token 14/50  patching first_token 15/50  patching first_token 16/50  patching first_token 17/50  patching first_token 18/50  patching first_token 19/50  patching first_token 20/50  patching first_token 21/50  patching first_token 22/50  patching first_token 23/50  patching first_token 24/50  patching first_token 25/50  patching first_token 26/50  patching first_token 27/50  patching first_token 28/50  patching first_token 29/50  patching first_token 30/50  patching first_token 31/50  patching first_token 32/50  patching first_token 33/50  patching first_token 34/50  patching first_token 35/50  patching first_token 36/50  patching first_token 37/50  patching first_token 38/50  patching first_token 39/50  patching first_token 40/50  patching first_token 41/50  patching first_token 42/50  patching first_token 43/50  patching first_token 44/50  patching first_token 45/50  patching first_token 46/50  patching first_token 47/50  patching first_token 48/50  patching first_token 49/50  patching first_token 50/50
+  first_token: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.00 | 0%
+    L 2: +0.01 | 0%
+    L 4: +0.03 | 0%
+    L 6: +0.05 | 4%
+    L 8: +0.06 | 2%
+    L10: +0.09 | 4%
+    L12: +0.12 | 2%
+    L14: +0.18 | 6%
+    L16: +0.27 | 10%
+    L18: +0.41 | 8%
+    L20: +0.64 | 12%
+    L22: +0.84 | 32%
+    L24: +0.93 | 36%
+    L26: +0.99 | 38%
+    L28: +1.00 | 38%

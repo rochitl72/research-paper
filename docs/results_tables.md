@@ -188,3 +188,189 @@ Real greedy decoding from held-out prompts (12 prompts). Output identical to pla
 | ahead_heads | 1.54 | 29.2% | ×1.42 |
 | word_head_then_ahead | 1.66 | 23.8% | ×1.55 |
 
+## Qwen3-1.7B-Base
+
+Run on macOS-26.5.1-arm64-arm-64bit (mps, float32), torch 2.14.1, transformers 5.18.0. 28 layers, d = 2048.
+
+| Language | Split | Paragraphs | Tokens | Seconds | Tokens/s |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Tamil | fit | 1500 | 313,749 | 559 | 561 |
+| Tamil | eval | 500 | 101,760 | 40605 | 3 |
+| Hindi | fit | 1500 | 287,495 | 6398 | 45 |
+| Hindi | eval | 500 | 106,678 | 4939 | 22 |
+| English | fit | 1500 | 104,090 | 7443 | 14 |
+| English | eval | 500 | 38,677 | 3351 | 12 |
+
+### Spelling share
+
+| Language | Words | Tokens/word | Multi-token words | Continuation tokens | p ≥ 0.5 | p ≥ 0.9 | p ≥ 0.99 | Greedy-correct continuations | Word bits in first token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Tamil | 39,754 | 9.59 | 96.4% | 89.6% | 53.5% | 35.1% | 19.0% | 69.0% | 8.2% |
+| Hindi | 74,842 | 4.82 | 98.9% | 79.3% | 50.1% | 35.9% | 21.1% | 71.7% | 26.7% |
+| English | 95,672 | 1.14 | 9.3% | 11.9% | 8.5% | 6.3% | 3.7% | 77.8% | 95.8% |
+
+The p columns are shares of all word tokens that are continuation tokens with model probability at least p.
+
+| Language | Boundary type | Share of continuation tokens | Near-certain (p ≥ 0.9) |
+| --- | --- | ---: | ---: |
+| Tamil | byte | 35.9% | 46.6% |
+| Tamil | grapheme | 27.3% | 44.5% |
+| Tamil | subword | 36.8% | 28.1% |
+| Hindi | byte | 35.2% | 45.9% |
+| Hindi | grapheme | 37.8% | 44.8% |
+| Hindi | subword | 27.0% | 45.0% |
+| English | byte | 0.4% | 19.1% |
+| English | grapheme | 0.0% | 16.7% |
+| English | subword | 99.6% | 53.4% |
+
+### Plan probe at the position before the word
+
+Tamil: 1000 candidate words, 4,515 held-out occurrences, 3 seeds.
+
+| Layer | Probe | Most frequent word | Shuffled-label control | Uniform chance | Probe, model spells word | Probe, model misspells |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 3.2% ± 0.7 | 3.2% | 1.6% | 1.0% | 10.1% | 1.7% |
+| 7 | 13.6% ± 0.2 | 3.2% | 1.5% | 1.0% | 31.0% | 9.9% |
+| 14 | 15.3% ± 0.4 | 3.2% | 1.4% | 1.0% | 36.6% | 10.7% |
+| 21 | 16.6% ± 0.3 | 3.2% | 1.5% | 1.0% | 40.7% | 11.4% |
+| 28 | 16.4% ± 0.3 | 3.2% | 1.4% | 1.0% | 40.4% | 11.2% |
+
+| Tokens written | Probe on state | Prefix-only dictionary | Gap | Candidate words | n |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 17.3% | 4.0% | +13.2 | 974 | 4,475 |
+| 2 | 32.0% | 14.7% | +17.4 | 85 | 4,422 |
+| 3 | 53.1% | 34.2% | +18.9 | 15 | 4,271 |
+| 4 | 63.0% | 48.5% | +14.5 | 7 | 3,825 |
+| 5 | 72.4% | 62.3% | +10.1 | 4 | 3,411 |
+| 6 | 78.2% | 72.2% | +6.0 | 3 | 2,798 |
+
+Hindi: 1000 candidate words, 16,370 held-out occurrences, 3 seeds.
+
+| Layer | Probe | Most frequent word | Shuffled-label control | Uniform chance | Probe, model spells word | Probe, model misspells |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 20.5% ± 0.5 | 24.4% | 15.8% | 1.2% | 35.2% | 5.8% |
+| 7 | 35.4% ± 0.3 | 24.4% | 13.6% | 1.2% | 55.7% | 15.1% |
+| 14 | 38.1% ± 0.7 | 24.4% | 14.0% | 1.2% | 60.4% | 15.8% |
+| 21 | 42.6% ± 0.1 | 24.4% | 14.9% | 1.2% | 67.9% | 17.3% |
+| 28 | 43.5% ± 0.3 | 24.4% | 15.3% | 1.2% | 69.6% | 17.5% |
+
+| Tokens written | Probe on state | Prefix-only dictionary | Gap | Candidate words | n |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 43.6% | 24.5% | +19.1 | 321 | 15,394 |
+| 2 | 67.9% | 41.2% | +26.7 | 21 | 12,854 |
+| 3 | 80.0% | 61.3% | +18.6 | 5 | 8,688 |
+| 4 | 85.5% | 75.1% | +10.5 | 3 | 5,972 |
+| 5 | 92.9% | 87.0% | +5.9 | 2 | 3,626 |
+| 6 | 96.1% | 93.7% | +2.4 | 1 | 2,296 |
+
+### Activation patching
+
+Tamil: 50 context pairs. Effect = shift of the next-token logit difference toward the donor word (median, with quartiles).
+
+| Layer | Pre-word position | (q25, q75) | First-token position (control) | Donor word spelled after pre-word patch | after first-token patch |
+| ---: | ---: | --- | ---: | ---: | ---: |
+| 0 | +0.00 | (+0.00, +0.28) | +0.00 | 0.0% | 0.0% |
+| 2 | +0.02 | (-0.00, +0.21) | +0.00 | 0.0% | 0.0% |
+| 4 | +0.03 | (-0.00, +0.24) | +0.03 | 4.0% | 0.0% |
+| 6 | +0.02 | (-0.00, +0.19) | +0.08 | 0.0% | 6.0% |
+| 8 | +0.06 | (-0.01, +0.20) | +0.09 | 2.0% | 4.0% |
+| 10 | +0.09 | (+0.00, +0.19) | +0.13 | 2.0% | 8.0% |
+| 12 | +0.08 | (+0.00, +0.19) | +0.19 | 2.0% | 8.0% |
+| 14 | +0.08 | (+0.03, +0.19) | +0.21 | 2.0% | 12.0% |
+| 16 | +0.08 | (+0.04, +0.19) | +0.23 | 2.0% | 14.0% |
+| 18 | +0.07 | (+0.02, +0.16) | +0.42 | 2.0% | 24.0% |
+| 20 | +0.06 | (+0.02, +0.11) | +0.67 | 2.0% | 34.0% |
+| 22 | +0.05 | (+0.02, +0.11) | +0.86 | 2.0% | 40.0% |
+| 24 | +0.02 | (-0.00, +0.05) | +0.96 | 2.0% | 44.0% |
+| 26 | +0.01 | (-0.00, +0.03) | +0.99 | 2.0% | 44.0% |
+| 28 | +0.00 | (+0.00, +0.00) | +1.00 | 0.0% | 42.0% |
+
+Hindi: 50 context pairs. Effect = shift of the next-token logit difference toward the donor word (median, with quartiles).
+
+| Layer | Pre-word position | (q25, q75) | First-token position (control) | Donor word spelled after pre-word patch | after first-token patch |
+| ---: | ---: | --- | ---: | ---: | ---: |
+| 0 | +0.09 | (+0.00, +0.33) | +0.00 | 2.0% | 0.0% |
+| 2 | +0.10 | (+0.01, +0.32) | +0.01 | 2.0% | 0.0% |
+| 4 | +0.11 | (-0.00, +0.34) | +0.03 | 4.0% | 0.0% |
+| 6 | +0.17 | (+0.03, +0.36) | +0.05 | 2.0% | 4.0% |
+| 8 | +0.17 | (+0.05, +0.43) | +0.06 | 4.0% | 2.0% |
+| 10 | +0.15 | (+0.04, +0.38) | +0.09 | 2.0% | 4.0% |
+| 12 | +0.16 | (+0.04, +0.35) | +0.12 | 2.0% | 2.0% |
+| 14 | +0.18 | (+0.06, +0.40) | +0.18 | 2.0% | 6.0% |
+| 16 | +0.15 | (+0.05, +0.33) | +0.27 | 2.0% | 10.0% |
+| 18 | +0.15 | (+0.05, +0.26) | +0.41 | 2.0% | 8.0% |
+| 20 | +0.13 | (+0.03, +0.23) | +0.64 | 2.0% | 12.0% |
+| 22 | +0.10 | (+0.03, +0.17) | +0.84 | 0.0% | 32.0% |
+| 24 | +0.02 | (+0.00, +0.06) | +0.93 | 0.0% | 36.0% |
+| 26 | +0.01 | (-0.00, +0.03) | +0.99 | 0.0% | 38.0% |
+| 28 | +0.00 | (+0.00, +0.00) | +1.00 | 0.0% | 38.0% |
+
+### Attention knockout
+
+Attention from the word's own positions to one context position is blocked at every layer. Change in log-probability of the word's continuation tokens, on words the model spells correctly.
+
+| Language | Words | Blocked position | Mean change (bits) | Median (bits) | Still spelled correctly |
+| --- | ---: | --- | ---: | ---: | ---: |
+| Tamil | 300 | last token before the word | -2.52 | -1.71 | 25.0% |
+| Tamil | 300 | token before that | -0.25 | -0.05 | 59.0% |
+| Tamil | 300 | random earlier token | -0.02 | +0.00 | 61.3% |
+| Hindi | 300 | last token before the word | -1.85 | -0.86 | 54.0% |
+| Hindi | 300 | token before that | -0.03 | -0.00 | 81.7% |
+| Hindi | 300 | random earlier token | -0.01 | +0.00 | 81.0% |
+
+### Drafters: decoder emulation on held-out text
+
+Tamil: head lexicon 3,787 words (covers 38.9% of held-out multi-token word occurrences); dictionary 8,990 words (covers 50.2%).
+
+| Drafter | Forward passes per word token | Word tokens per pass | Draft acceptance | Whole word on first draft |
+| --- | ---: | ---: | ---: | ---: |
+| oracle | 0.395 | ×2.53 | 23.4% | 9.4% |
+| dictionary_small | 0.753 | ×1.33 | 17.1% | 0.6% |
+| dictionary | 0.707 | ×1.41 | 19.7% | 0.5% |
+| preword_head_L7 | 0.686 | ×1.46 | 16.0% | 2.0% |
+| preword_head_L14 | 0.683 | ×1.46 | 16.5% | 2.3% |
+| preword_head_L21 | 0.676 | ×1.48 | 16.9% | 2.7% |
+| preword_head_L28 | 0.677 | ×1.48 | 17.0% | 2.4% |
+| current_head_L28 | 0.668 | ×1.50 | 17.2% | 2.5% |
+| ahead_heads | 0.711 | ×1.41 | 16.8% | 0.7% |
+| word_head_then_ahead | 0.628 | ×1.59 | 16.4% | 2.5% |
+| dictionary_then_ahead | 0.667 | ×1.50 | 18.3% | 0.5% |
+
+Real greedy decoding from held-out prompts (12 prompts). Output identical to plain greedy on every prompt: **True**.
+
+| Drafter | Tokens per forward pass | Draft acceptance | Wall-clock speedup |
+| --- | ---: | ---: | ---: |
+| plain | 1.00 | 0.0% | ×1.00 |
+| dictionary | 1.50 | 22.0% | ×1.43 |
+| preword_head | 1.64 | 18.3% | ×1.49 |
+| current_head | 1.71 | 20.2% | ×1.56 |
+| ahead_heads | 1.85 | 28.0% | ×1.73 |
+| word_head_then_ahead | 2.00 | 21.4% | ×1.67 |
+
+Hindi: head lexicon 4,063 words (covers 77.2% of held-out multi-token word occurrences); dictionary 8,498 words (covers 84.7%).
+
+| Drafter | Forward passes per word token | Word tokens per pass | Draft acceptance | Whole word on first draft |
+| --- | ---: | ---: | ---: | ---: |
+| oracle | 0.443 | ×2.26 | 37.7% | 38.8% |
+| dictionary_small | 0.706 | ×1.42 | 27.4% | 15.0% |
+| dictionary | 0.675 | ×1.48 | 29.6% | 14.8% |
+| preword_head_L7 | 0.646 | ×1.55 | 26.8% | 18.9% |
+| preword_head_L14 | 0.634 | ×1.58 | 28.1% | 20.7% |
+| preword_head_L21 | 0.616 | ×1.62 | 29.8% | 23.3% |
+| preword_head_L28 | 0.615 | ×1.63 | 29.9% | 23.5% |
+| current_head_L28 | 0.605 | ×1.65 | 30.4% | 23.1% |
+| ahead_heads | 0.676 | ×1.48 | 26.9% | 17.3% |
+| word_head_then_ahead | 0.590 | ×1.70 | 29.6% | 23.1% |
+| dictionary_then_ahead | 0.660 | ×1.51 | 28.7% | 14.8% |
+
+Real greedy decoding from held-out prompts (12 prompts). Output identical to plain greedy on every prompt: **True**.
+
+| Drafter | Tokens per forward pass | Draft acceptance | Wall-clock speedup |
+| --- | ---: | ---: | ---: |
+| plain | 1.00 | 0.0% | ×1.00 |
+| dictionary | 1.47 | 27.6% | ×1.74 |
+| preword_head | 1.70 | 30.9% | ×1.92 |
+| current_head | 1.70 | 29.0% | ×1.86 |
+| ahead_heads | 1.60 | 29.2% | ×1.75 |
+| word_head_then_ahead | 1.75 | 26.5% | ×1.83 |
+

@@ -1,0 +1,44 @@
+
+===== 04_heads_and_decoding_Qwen3-1.7B-Base | 2026-10-05 05:28:28 | argv: --model Qwen/Qwen3-1.7B-Base --dtype float32 --langs ta hi
+
+[ta] head lexicon 3787 words (covers 38.9% of held-out multi-token words); dictionary 8990 words (covers 50.2%)
+    oracle (upper bound): 0.395 forward passes per word token (x2.53 fewer), draft acceptance 23.4%, whole word on first draft 9.4%
+   dictionary (head lex): 0.753 forward passes per word token (x1.33 fewer), draft acceptance 17.1%, whole word on first draft 0.6%
+              dictionary: 0.707 forward passes per word token (x1.41 fewer), draft acceptance 19.7%, whole word on first draft 0.5%
+        pre-word head L7: 0.686 forward passes per word token (x1.46 fewer), draft acceptance 16.0%, whole word on first draft 2.0%
+       pre-word head L14: 0.683 forward passes per word token (x1.46 fewer), draft acceptance 16.5%, whole word on first draft 2.3%
+       pre-word head L21: 0.676 forward passes per word token (x1.48 fewer), draft acceptance 16.9%, whole word on first draft 2.7%
+       pre-word head L28: 0.677 forward passes per word token (x1.48 fewer), draft acceptance 17.0%, whole word on first draft 2.4%
+  current-state head L28: 0.668 forward passes per word token (x1.50 fewer), draft acceptance 17.2%, whole word on first draft 2.5%
+       token-ahead heads: 0.711 forward passes per word token (x1.41 fewer), draft acceptance 16.8%, whole word on first draft 0.7%
+   word head, then ahead: 0.628 forward passes per word token (x1.59 fewer), draft acceptance 16.4%, whole word on first draft 2.5%
+  dictionary, then ahead: 0.667 forward passes per word token (x1.50 fewer), draft acceptance 18.3%, whole word on first draft 0.5%
+  decoding prompt 1/12  decoding prompt 2/12  decoding prompt 3/12  decoding prompt 4/12  decoding prompt 5/12  decoding prompt 6/12  decoding prompt 7/12  decoding prompt 8/12  decoding prompt 9/12  decoding prompt 10/12  decoding prompt 11/12  decoding prompt 12/12
+                   plain: 1.00 tokens/forward, acceptance 0.0%, wall-clock x1.00
+              dictionary: 1.50 tokens/forward, acceptance 22.0%, wall-clock x1.43
+            preword_head: 1.64 tokens/forward, acceptance 18.3%, wall-clock x1.49
+            current_head: 1.71 tokens/forward, acceptance 20.2%, wall-clock x1.56
+             ahead_heads: 1.85 tokens/forward, acceptance 28.0%, wall-clock x1.73
+    word_head_then_ahead: 2.00 tokens/forward, acceptance 21.4%, wall-clock x1.67
+  lossless (identical to plain greedy on all prompts): True
+
+[hi] head lexicon 4063 words (covers 77.2% of held-out multi-token words); dictionary 8498 words (covers 84.7%)
+    oracle (upper bound): 0.443 forward passes per word token (x2.26 fewer), draft acceptance 37.7%, whole word on first draft 38.8%
+   dictionary (head lex): 0.706 forward passes per word token (x1.42 fewer), draft acceptance 27.4%, whole word on first draft 15.0%
+              dictionary: 0.675 forward passes per word token (x1.48 fewer), draft acceptance 29.6%, whole word on first draft 14.8%
+        pre-word head L7: 0.646 forward passes per word token (x1.55 fewer), draft acceptance 26.8%, whole word on first draft 18.9%
+       pre-word head L14: 0.634 forward passes per word token (x1.58 fewer), draft acceptance 28.1%, whole word on first draft 20.7%
+       pre-word head L21: 0.616 forward passes per word token (x1.62 fewer), draft acceptance 29.8%, whole word on first draft 23.3%
+       pre-word head L28: 0.615 forward passes per word token (x1.63 fewer), draft acceptance 29.9%, whole word on first draft 23.5%
+  current-state head L28: 0.605 forward passes per word token (x1.65 fewer), draft acceptance 30.4%, whole word on first draft 23.1%
+       token-ahead heads: 0.676 forward passes per word token (x1.48 fewer), draft acceptance 26.9%, whole word on first draft 17.3%
+   word head, then ahead: 0.590 forward passes per word token (x1.70 fewer), draft acceptance 29.6%, whole word on first draft 23.1%
+  dictionary, then ahead: 0.660 forward passes per word token (x1.51 fewer), draft acceptance 28.7%, whole word on first draft 14.8%
+  decoding prompt 1/12  decoding prompt 2/12  decoding prompt 3/12  decoding prompt 4/12  decoding prompt 5/12  decoding prompt 6/12  decoding prompt 7/12  decoding prompt 8/12  decoding prompt 9/12  decoding prompt 10/12  decoding prompt 11/12  decoding prompt 12/12
+                   plain: 1.00 tokens/forward, acceptance 0.0%, wall-clock x1.00
+              dictionary: 1.47 tokens/forward, acceptance 27.6%, wall-clock x1.74
+            preword_head: 1.70 tokens/forward, acceptance 30.9%, wall-clock x1.92
+            current_head: 1.70 tokens/forward, acceptance 29.0%, wall-clock x1.86
+             ahead_heads: 1.60 tokens/forward, acceptance 29.2%, wall-clock x1.75
+    word_head_then_ahead: 1.75 tokens/forward, acceptance 26.5%, wall-clock x1.83
+  lossless (identical to plain greedy on all prompts): True
