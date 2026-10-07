@@ -46,7 +46,10 @@ def main():
         ST, TOK, Y, TM, FM = eagle_seq_data(fit, last, vocab, K=6)
         print(f"  training words: {len(ST)}")
         t0 = time.time()
-        head = fit_word_eagle_rollout(ST, TOK, Y, TM, FM, emb, len(vocab), hidden=args.hidden, epochs=args.epochs)
+        # Train the head on CPU: the standardized state tensor (N x K x d) is
+        # several GB and would OOM the MPS pool on top of a multi-B target model.
+        head = fit_word_eagle_rollout(ST, TOK, Y, TM, FM, emb, len(vocab), hidden=args.hidden,
+                                      epochs=args.epochs, device="cpu")
         fit_s = time.time() - t0
         # current best baseline: word head (current state) + ahead, over the same vocab
         lex = Lexicon.from_records(fit, size=5000, min_count=2)

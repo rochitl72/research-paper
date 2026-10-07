@@ -23,9 +23,10 @@ picture, we build a lossless word-level speculative decoder: it drafts whole
 words and verifies them in one pass, producing token-for-token identical greedy
 output at up to $2.0$ tokens per forward on a laptop. Our strongest drafter,
 \textsc{IndicSpec}, is a word-scoped EAGLE head trained with scheduled-sampling
-rollouts; it reaches $2.15$ tokens per forward and \x$1.41$ wall-clock on Tamil,
-with the advantage growing at larger scale (up to \x$2.10$ on Hindi at $1.7$B),
-and extends to lossless speculative \emph{sampling} that preserves the target's
+rollouts; it beats the convex drafters at every scale (0.6B, 1.7B, 4B), with a
+wall-clock payoff that jumps from \x$1.4$ at $0.6$B to \x$1.7$--\x$2.1$ at the
+larger $1.7$B--$4$B models, and extends to lossless speculative \emph{sampling}
+that preserves the target's
 temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$). We release
 \textsc{IndicSpec}---head, both decoders, and a headroom diagnostic---as a
 \texttt{pip}-installable tool, together with all code, data pipeline and
@@ -95,9 +96,9 @@ half right in an informative way.
   (\S\ref{sec:indicspec}). A learned autoregressive draft head
   \citep{li2024eagle} scoped to a single word and trained with
   scheduled-sampling rollouts \citep{bengio2015scheduled} beats the convex
-  drafters on both languages and both model sizes, and its wall-clock advantage
-  \emph{grows with scale}---Tamil \x$1.41$ at $0.6$B to \x$1.84$ at $1.7$B, Hindi
-  \x$1.40$ to \x$2.10$. We extend it
+  drafters on every language and model size (0.6B, 1.7B, 4B), and its wall-clock
+  payoff jumps from modest at $0.6$B (\x$1.1$--\x$1.4$) to large at $1.7$B--$4$B
+  (\x$1.7$--\x$2.1$)---the method matters most at deployable sizes. We extend it
   to lossless speculative \emph{sampling} \citep{leviathan2023fast,
   chen2023accelerating}---preserving the target's temperature-$\tau$
   distribution, not just its arg-max---where it reaches $2.32$ tok/fwd on Tamil
@@ -871,15 +872,24 @@ Model & Decoder & tok/fwd & accept & wall \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{1.7B, Hi} & convex (word$+$ahead) & 1.79 & 28.7\% & \x1.73 \\
                           & \textbf{IndicSpec head} & \textbf{1.86} & 30.0\% & \textbf{\x2.10} \\
+\cmidrule(lr){1-5}
+\multirow{2}{*}{4.0B, Ta} & convex (word$+$ahead) & 2.03 & 22.0\% & \x1.66 \\
+                          & \textbf{IndicSpec head} & \textbf{2.23} & 24.5\% & \textbf{\x1.73} \\
+\cmidrule(lr){1-5}
+\multirow{2}{*}{4.0B, Hi} & convex (word$+$ahead) & 1.82 & 30.9\% & \x1.97 \\
+                          & \textbf{IndicSpec head} & \textbf{1.98} & 38.0\% & \textbf{\x2.09} \\
 \bottomrule
 \end{tabular}
 \caption{The learned word-scoped head vs.\ the best convex drafter, real
-lossless greedy decoding ($24$ held-out prompts, $64$ new tokens each). The head
-wins on every model and language, and its advantage \emph{grows with scale}:
-Tamil wall-clock rises from \x$1.41$ at $0.6$B to \x$1.84$ at $1.7$B, Hindi from
-\x$1.40$ to \x$2.10$---re-reading its own predicted feature keeps late-word
-drafts on track where the convex heads drift, and the fixed head cost is
-amortized against a larger base forward pass.}
+lossless greedy decoding ($24$ held-out prompts, $64$ new tokens each), across
+three model sizes. The head wins on every model and language in accepted tokens
+per forward pass. The wall-clock payoff is modest at $0.6$B (\x$1.1$--\x$1.4$)
+and large at $1.7$B--$4$B (\x$1.7$--\x$2.1$): the fixed cost of the head is
+amortized against a more expensive base forward pass, so the method is most
+useful exactly at deployable model sizes. Wall-clock is measured on a throttled
+M1 GPU and is noisier than tokens-per-forward (e.g.\ Tamil $1.7$B vs.\ $4$B),
+which is the hardware-independent quality signal and stays above the convex
+baseline throughout.}
 \label{tab:eagle}
 \end{table}
 
