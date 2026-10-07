@@ -1,0 +1,35 @@
+
+===== 01_spelling_share_xglm-564M | 2026-10-06 17:13:34 | argv: --model facebook/xglm-564M
+
+[ta] words=57754  tokens/word=2.54  multi-token words=76.7%
+  continuation tokens = 60.7% of word tokens
+  spelling share @p>=0.5: 18.7% of word tokens (30.9% of continuations)
+  spelling share @p>=0.9: 7.6% of word tokens (12.5% of continuations)
+  spelling share @p>=0.99: 1.9% of word tokens (3.1% of continuations)
+  greedy predicts continuation: 45.4%
+  bits/word: first token 7.08, continuation 5.46 -> 56.5% of word information is in the first token
+  boundary mix: {'grapheme': '20.5%', 'subword': '79.5%'}
+  deterministic@0.9 by boundary: {'grapheme': '14.3%', 'subword': '12.0%'}
+  bits by token position in word: 7.24 3.60 3.34 3.57 3.84 3.82 3.90 4.10 3.74 4.94 5.19
+
+[hi] words=98386  tokens/word=1.46  multi-token words=30.8%
+  continuation tokens = 31.7% of word tokens
+  spelling share @p>=0.5: 16.4% of word tokens (51.8% of continuations)
+  spelling share @p>=0.9: 10.3% of word tokens (32.4% of continuations)
+  spelling share @p>=0.99: 4.7% of word tokens (15.0% of continuations)
+  greedy predicts continuation: 61.9%
+  bits/word: first token 5.75, continuation 1.30 -> 81.6% of word information is in the first token
+  boundary mix: {'subword': '69.6%', 'grapheme': '30.4%'}
+  deterministic@0.9 by boundary: {'subword': '32.1%', 'grapheme': '33.1%'}
+  bits by token position in word: 8.07 2.90 2.44 3.11 3.26 3.33 6.02 6.59
+
+[en] words=97345  tokens/word=1.21  multi-token words=17.2%
+  continuation tokens = 17.6% of word tokens
+  spelling share @p>=0.5: 11.3% of word tokens (64.0% of continuations)
+  spelling share @p>=0.9: 8.0% of word tokens (45.4% of continuations)
+  spelling share @p>=0.99: 4.2% of word tokens (23.9% of continuations)
+  greedy predicts continuation: 71.7%
+  bits/word: first token 5.80, continuation 0.45 -> 92.8% of word information is in the first token
+  boundary mix: {'subword': '100.0%', 'grapheme': '0.0%'}
+  deterministic@0.9 by boundary: {'subword': '45.4%', 'grapheme': '0.0%'}
+  bits by token position in word: 9.47 2.09 2.11 2.62 4.32 3.29 0.96

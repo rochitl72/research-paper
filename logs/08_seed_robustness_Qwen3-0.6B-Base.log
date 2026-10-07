@@ -1,0 +1,3 @@
+
+===== 08_seed_robustness_Qwen3-0.6B-Base | 2026-10-07 10:39:56 | argv: --model Qwen/Qwen3-0.6B-Base --seeds 0 1 2 --pairs 80 --words 200
+[ta seed 0] first-token transfer(last) 0.38, pre-word max median effect 0.137, knockout pre-word -2.50 bits (random -0.02), still-spelled 0.26

@@ -1,0 +1,27 @@
+
+===== 02_plan_probe_xglm-564M | 2026-10-06 17:13:41 | argv: --model facebook/xglm-564M --langs ta hi
+
+[ta] classes=1000 groups=316 test n=3634
+  layer   probe  majority  control  chance | model spells misspells
+      0   0.443     0.428    0.355   0.300 |        0.524     0.348
+      7   0.500     0.428    0.364   0.300 |        0.606     0.374
+     14   0.561     0.428    0.373   0.300 |        0.673     0.427
+     21   0.590     0.428    0.370   0.300 |        0.703     0.456
+     24   0.594     0.428    0.375   0.300 |        0.708     0.459
+  word identity as the word unfolds (layer 24): tokens written -> state probe vs prefix-only dictionary
+    1 tokens: state 0.644 | prefix only 0.512 (n=3910, 6 candidate words)
+    2 tokens: state 0.833 | prefix only 0.796 (n=1198, 2 candidate words)
+    3 tokens: state 0.830 | prefix only 0.852 (n=352, 2 candidate words)
+    4 tokens: state 0.987 | prefix only 0.937 (n=79, 1 candidate words)
+
+[hi] classes=1000 groups=333 test n=3458
+  layer   probe  majority  control  chance | model spells misspells
+      0   0.526     0.475    0.384   0.330 |        0.574     0.411
+      7   0.587     0.475    0.394   0.330 |        0.646     0.445
+     14   0.667     0.475    0.409   0.330 |        0.735     0.506
+     21   0.712     0.475    0.405   0.330 |        0.786     0.533
+     24   0.714     0.475    0.412   0.330 |        0.791     0.532
+  word identity as the word unfolds (layer 24): tokens written -> state probe vs prefix-only dictionary
+    1 tokens: state 0.820 | prefix only 0.633 (n=4163, 3 candidate words)
+    2 tokens: state 0.962 | prefix only 0.956 (n=1004, 1 candidate words)
+    3 tokens: state 0.948 | prefix only 0.954 (n=153, 1 candidate words)

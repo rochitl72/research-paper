@@ -1,0 +1,83 @@
+{
+  "env": {
+    "python": "3.11.14",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpus": 8,
+    "time": "2026-10-06 16:59:38 IST",
+    "model": "facebook/xglm-564M",
+    "device": "mps",
+    "dtype": "torch.float32",
+    "n_layers": 24,
+    "d_model": 1024
+  },
+  "args": {
+    "model": "facebook/xglm-564M",
+    "langs": [
+      "ta",
+      "hi",
+      "en"
+    ],
+    "n_fit": 1500,
+    "n_eval": 500,
+    "max_len": 256,
+    "batch_size": 4,
+    "inword_positions": 6,
+    "layer_step": 7,
+    "device": "auto",
+    "dtype": "float32"
+  },
+  "hidden_layers": [
+    0,
+    7,
+    14,
+    21,
+    24
+  ],
+  "runs": [
+    {
+      "lang": "ta",
+      "split": "fit",
+      "paragraphs": 1500,
+      "tokens": 130531,
+      "seconds": 182.0347878932953
+    },
+    {
+      "lang": "ta",
+      "split": "eval",
+      "paragraphs": 500,
+      "tokens": 40132,
+      "seconds": 89.6333577632904
+    },
+    {
+      "lang": "hi",
+      "split": "fit",
+      "paragraphs": 1500,
+      "tokens": 122586,
+      "seconds": 316.8325870037079
+    },
+    {
+      "lang": "hi",
+      "split": "eval",
+      "paragraphs": 500,
+      "tokens": 46974,
+      "seconds": 74.36236906051636
+    },
+    {
+      "lang": "en",
+      "split": "fit",
+      "paragraphs": 1500,
+      "tokens": 104989,
+      "seconds": 98.03913187980652
+    },
+    {
+      "lang": "en",
+      "split": "eval",
+      "paragraphs": 500,
+      "tokens": 38222,
+      "seconds": 54.963319063186646
+    }
+  ]
+}

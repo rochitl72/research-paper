@@ -37,15 +37,18 @@ Measuring per-token surprisal on Qwen3-0.6B and 1.7B over Tamil, Hindi and
 English Wikipedia, we find that the first token of an Indic word carries
 almost none of the word's information---$8\%$ for Tamil and $27\%$ for Hindi,
 against $96\%$ for English---because nearly every word begins with the same
-shared script bytes. A linear probe on the hidden state \emph{before} the word
+shared script bytes; a second model family whose tokenizer fragments Indic far
+less puts the information back in the first token, showing the effect is
+tokenizer-driven, not a property of the script. A linear probe on the hidden
+state \emph{before} the word
 is written identifies the upcoming word far above dictionary and control
 baselines, and stays ahead of the written prefix as the word unfolds. Yet this
 information is not a localized ``plan'': activation patching of the pre-word
 position transfers the donor word in under $8\%$ of matched natural-context
 pairs, while a first-token-position control reaches $100\%$; attention
 knockout nonetheless shows the pre-word position is a \emph{necessary relay},
-costing about two bits and halving correct spelling when blocked. All findings
-replicate across both model sizes and sharpen with scale. Guided by this
+costing about two bits and halving correct spelling when blocked. Every finding
+replicates across two model sizes and a second model family. Guided by this
 picture, we build a lossless word-level speculative decoder from linear heads
 that fit in under two minutes on a laptop; it produces token-for-token
 identical greedy output at $1.5$--$2.0$ tokens per forward pass and up to
@@ -139,8 +142,12 @@ target model itself, and multi-token prediction \citep{gloeckle2024multitoken}
 trains such heads from scratch. Our decoder is in this family, with two
 differences of emphasis: the draft unit is a whole \emph{word} (a span the
 tokenizer fragmented), and the heads are fit by convex optimization on frozen
-features so the whole thing runs on a laptop. We use these methods as a lens on
-the representation question rather than to chase state-of-the-art throughput.
+features so the whole thing runs on a laptop. Closest in motivation,
+\citet{yi2024multilingual} speed up multilingual inference with
+language-specific \emph{draft models}; we instead target the within-word
+fragmentation directly, with per-language word heads on the target model's own
+features and no separate draft model. We use these methods as a lens on the
+representation question rather than to chase state-of-the-art throughput.
 
 \paragraph{Probing and causal analysis.} Linear probes
 \citep{alain2017probes} measure what is linearly decodable from a hidden
@@ -153,6 +160,20 @@ shuffled-label control throughout. To ask whether decodable information is
 between two natural contexts rather than synthetic edits. The combination of a
 positive probe, a negative patching result and a positive knockout result is
 what lets us separate ``readable'' from ``stored here'' from ``needed here''.
+
+\paragraph{Reading and planning future tokens.} Closest to our probe, Future
+Lens \citep{pal2023futurelens} shows that several upcoming tokens can be
+anticipated from a single hidden state. \citet{wu2024planahead} ask whether
+this reflects deliberate \emph{pre-caching} of future-token features or mere
+\emph{breadcrumbs} left by computation useful for the present token, and find
+natural language modeling is mostly breadcrumbs at small scale. We make both
+questions concrete for a unit the tokenizer has shattered: whether the identity
+of a whole multi-token \emph{word} is decodable before it is written in a
+heavily fragmented script, and---unlike these works---we pair the probe with
+patching and knockout to test whether that information is a localized stored
+plan (pre-caching) or re-derived from context at each step (breadcrumbs). For
+Indic words the answer is the latter, with the pre-word position acting only as
+a necessary relay.
 
 \section{Setup and definitions}
 \label{sec:setup}
@@ -266,6 +287,38 @@ neither model clears it, but the gap narrows with scale and $63$--$69\%$ of
 continuation tokens are already greedy-correct, which is what the decoder in
 \S\ref{sec:decoder} actually exploits.
 
+\paragraph{A second family confirms the tokenizer is the cause.} To check that
+this is a property of the \emph{tokenizer} and not of the languages, we repeat
+the measurement on XGLM-564M \citep{xglm2022}, a different family whose
+SentencePiece tokenizer was trained with heavy multilingual (including Indic)
+coverage. It fragments Indic words far less, and the first-token share rises in
+lockstep (Table~\ref{tab:family}): a Tamil word is $2.5$ tokens instead of
+$9.6$, and $57\%$ of its information is now in the first token instead of $8\%$.
+The phenomenon tracks fragmentation, not script: a model whose tokenizer spends
+vocabulary on Indic behaves, for Tamil and Hindi, much more like it does for
+English. The low first-token share under byte-level BPE is therefore a cost of
+the tokenizer, and the internal correlate of the sequence-length unfairness of
+\citet{petrov2023tokenizers}.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Tokens / word} & \multicolumn{2}{c}{First-token share} \\
+ & Qwen3 & XGLM & Qwen3 & XGLM \\
+\midrule
+Tamil   & 9.59 & 2.54 & 7.7\%  & 56.5\% \\
+Hindi   & 4.82 & 1.46 & 24.9\% & 81.6\% \\
+English & 1.14 & 1.21 & 94.7\% & 92.8\% \\
+\bottomrule
+\end{tabular}
+\caption{Cross-family check (Qwen3-0.6B byte-level BPE vs XGLM-564M
+SentencePiece). The less a tokenizer fragments a word, the more of the word's
+information sits in its first token. The effect is tokenizer-driven, not
+language-intrinsic.}
+\label{tab:family}
+\end{table}
+
 \section{The word is readable before it is written}
 \label{sec:probe}
 
@@ -313,6 +366,9 @@ quarter of the network and then plateaus. Crucially, on words the model later
 spells correctly the probe is far more accurate---$34.6\%$ vs.\ $12.0\%$ on
 misspelled words for Tamil $0.6$B, $69.2\%$ vs.\ $17.8\%$ for Hindi---so the
 decodable signal tracks the model's own success, not just corpus frequency.
+Every probe$-$control gap is large relative to seed variation (3 seeds): Tamil
+$+12.5$ points at $43$ SD and Hindi $+24.7$ at $58$ SD on $0.6$B, rising to $46$
+and $83$ SD on $1.7$B.
 
 \paragraph{As the word unfolds.} We then probe the state available after
 $j=1,\dots,6$ tokens of the word have been written, against only those
@@ -374,7 +430,10 @@ words, the choice of word is \emph{not} sitting at the pre-word position waiting
 to be executed; it is assembled over the course of the word, and the position
 that accumulates the causal signal is the one \emph{inside} the word, late in
 the network. This directly contradicts the ``words before tokens'' hypothesis
-in its strong form.
+in its strong form. The contrast is unambiguous: at the last layer the
+first-token control transfers the donor word in $21$--$44\%$ of pairs while the
+pre-word patch transfers it in none, with no pair showing the reverse (McNemar
+$p<10^{-4}$ for every model and language).
 
 \begin{figure}[t]
 \centering
@@ -395,7 +454,11 @@ Table~\ref{tab:knockout} shows a sharp, local effect: blocking the pre-word
 position costs $2.3$--$2.5$ bits on Tamil and $1.8$--$1.9$ on Hindi, and drops
 correct spelling to $25$--$28\%$ (Tamil) and $52$--$54\%$ (Hindi). Blocking the
 token just before it, or a random earlier context token, costs essentially
-nothing ($\le 0.25$ bits) and leaves spelling almost intact.
+nothing ($\le 0.25$ bits) and leaves spelling almost intact. The pre-word cost
+dwarfs the random-position control on a paired test (Wilcoxon $p<10^{-30}$ for
+both languages and models); the bootstrap $95\%$ CI on the mean cost is, e.g.,
+$[-2.82,-2.23]$ bits for Tamil on $1.7$B versus $[-0.05,+0.01]$ for a random
+position.
 
 \begin{table}[t]
 \centering\small
@@ -429,6 +492,16 @@ information is linearly present in the shared context representation) even
 though patching cannot move it (it is not a localized variable). It also
 predicts the ceiling we hit next: a drafter that reads one early state cannot
 be certain of a word that the model itself has not yet fixed.
+
+\paragraph{The mechanism replicates on a second family.} Run on XGLM-564M, the
+same picture holds and is if anything sharper: patching the pre-word position
+transfers the donor word in $0\%$ of pairs for both languages while the
+first-token control reaches $74\%$ (Tamil) and $89\%$ (Hindi), and knockout of
+the pre-word position costs $1.4$ bits of continuation certainty against
+$\le 0.06$ for a random position. The probe likewise beats its baselines
+(Tamil $59\%$ vs.\ a $38\%$ control and $43\%$ dictionary prior). ``Readable,
+necessary, but not localized'' is therefore not an artifact of one tokenizer or
+one model family.
 
 \section{A lossless word-level speculative decoder}
 \label{sec:decoder}
@@ -493,6 +566,10 @@ context-blind dictionary consistently, and the gain over plain decoding is
 larger on $1.7$B than on $0.6$B (e.g.\ Tamil word+ahead, \x1.46 to \x1.67
 wall-clock), because the fixed cost of the linear heads is amortized against a
 more expensive base forward pass---the method pays off more as the model grows.
+Bootstrap $95\%$ CIs over prompts put the best drafter's tokens per forward pass
+clearly above one on every model and language (e.g.\ Tamil $[1.88,2.20]$ on
+$1.7$B); the wall-clock speedup is noisier on throttled MPS but positive on
+$9$--$11$ of $12$ prompts.
 The emulated upper bound (a drafter that is always right) is \x$2.5$ fewer
 passes on Tamil, so a meaningful gap remains; two things limit us, both
 predicted by the mechanism: lexicon coverage is low under heavy inflection, and
@@ -500,6 +577,15 @@ the word is not fixed early (\S\ref{sec:causal}), so an early draft is often
 wrong and only partially accepted. Token-ahead heads, which re-read the state
 every step and need no lexicon, are the single best stand-alone drafter on
 Tamil for exactly this reason.
+
+\paragraph{The gain is proportional to fragmentation.} Running the same lossless
+decoder on XGLM-564M, whose tokenizer barely fragments Indic, the best drafter
+reaches only $1.1$ tokens per forward pass and no wall-clock win (Tamil
+\x$1.20$, Hindi \x$0.97$)---there is almost no within-word structure left to
+draft. This is the point: the method recovers latency exactly where the
+tokenizer destroys it (Qwen3 Tamil, \x$1.67$) and does nothing where
+tokenization is already efficient. The decoder is a remedy for fragmentation,
+and its benefit scales with how badly a model's tokenizer fragments the script.
 
 \section{Discussion and limitations}
 
@@ -514,16 +600,18 @@ position acting as a necessary relay rather than a store. A lossless decoder
 built on this reads the freshest state, drafts a whole word, and recovers a
 good part of the latency lost to fragmentation.
 
-\paragraph{Limitations.} (i) One model family (Qwen3) at two sizes; we have not
-run a second family (e.g.\ Gemma), so ``replicates across scale'' is within one
-family. (ii) Greedy decoding only; lossless speculative \emph{sampling} needs
-the standard accept/reject rule, which we have not implemented. (iii) Wall-clock
-numbers are batch-size-1 on Metal/MPS and include Python-side drafter overhead;
-on CPU the extra draft tokens are not free and the same decoder is slower than
-plain decoding. (iv) Patching uses $50$--$80$ context pairs and knockout $300$
-words at a single seed; the knockout is a whole-layer attention block, not a
-per-head path patch, so ``necessary relay'' is a coarse claim pending finer
-analysis. (v) Wikipedia text only; the 20231101 dump may overlap the models'
+\paragraph{Limitations.} (i) Three models---two Qwen3 sizes and a second family,
+XGLM-564M---across which every finding replicates; still, two families with
+$\le 1.7$B parameters is a narrow sweep, and larger models and more families
+(Gemma, Llama) are future work. (ii) Greedy decoding only; lossless
+speculative \emph{sampling} needs the standard accept/reject rule, which we have
+not implemented. (iii) Wall-clock numbers are batch-size-1 on Metal/MPS and
+include Python-side drafter overhead; on CPU the extra draft tokens are not free
+and the same decoder is slower than plain decoding. (iv) Patching uses
+$50$--$80$ context pairs and knockout $300$ words; we report bootstrap $95\%$
+CIs and paired tests, and seed-robustness over the random selection, but the
+knockout is a whole-layer attention block, not a per-head path patch, so
+``necessary relay'' is a coarse claim pending finer analysis. (v) Wikipedia text only; the 20231101 dump may overlap the models'
 training data, which would inflate predictability. (vi) The causal reading in
 \S\ref{sec:causal} is an interpretation consistent with three experiments, not
 a validated circuit.

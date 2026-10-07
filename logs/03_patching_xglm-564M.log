@@ -1,0 +1,64 @@
+
+===== 03_patching_xglm-564M | 2026-10-06 21:29:48 | argv: --model facebook/xglm-564M --dtype float32 --langs ta hi --pairs 80 --min-conf 0.3
+[ta] 80 pairs
+  patching preword 1/80  patching preword 2/80  patching preword 3/80  patching preword 4/80  patching preword 5/80  patching preword 6/80  patching preword 7/80  patching preword 8/80  patching preword 9/80  patching preword 10/80  patching preword 11/80  patching preword 12/80  patching preword 13/80  patching preword 14/80  patching preword 15/80  patching preword 16/80  patching preword 17/80  patching preword 18/80  patching preword 19/80  patching preword 20/80  patching preword 21/80  patching preword 22/80  patching preword 23/80  patching preword 24/80  patching preword 25/80  patching preword 26/80  patching preword 27/80  patching preword 28/80  patching preword 29/80  patching preword 30/80  patching preword 31/80  patching preword 32/80  patching preword 33/80  patching preword 34/80  patching preword 35/80  patching preword 36/80  patching preword 37/80  patching preword 38/80  patching preword 39/80  patching preword 40/80  patching preword 41/80  patching preword 42/80  patching preword 43/80  patching preword 44/80  patching preword 45/80  patching preword 46/80  patching preword 47/80  patching preword 48/80  patching preword 49/80  patching preword 50/80  patching preword 51/80  patching preword 52/80  patching preword 53/80  patching preword 54/80  patching preword 55/80  patching preword 56/80  patching preword 57/80  patching preword 58/80  patching preword 59/80  patching preword 60/80  patching preword 61/80  patching preword 62/80  patching preword 63/80  patching preword 64/80  patching preword 65/80  patching preword 66/80  patching preword 67/80  patching preword 68/80  patching preword 69/80  patching preword 70/80  patching preword 71/80  patching preword 72/80  patching preword 73/80  patching preword 74/80  patching preword 75/80  patching preword 76/80  patching preword 77/80  patching preword 78/80  patching preword 79/80  patching preword 80/80
+  preword: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.12 | 14%
+    L 2: +0.21 | 14%
+    L 4: +0.15 | 9%
+    L 6: +0.08 | 9%
+    L 8: +0.06 | 9%
+    L10: +0.05 | 8%
+    L12: +0.04 | 4%
+    L14: +0.02 | 1%
+    L16: +0.02 | 0%
+    L18: +0.00 | 0%
+    L20: +0.00 | 0%
+    L22: +0.00 | 0%
+    L24: +0.00 | 0%
+  patching first_token 1/80  patching first_token 2/80  patching first_token 3/80  patching first_token 4/80  patching first_token 5/80  patching first_token 6/80  patching first_token 7/80  patching first_token 8/80  patching first_token 9/80  patching first_token 10/80  patching first_token 11/80  patching first_token 12/80  patching first_token 13/80  patching first_token 14/80  patching first_token 15/80  patching first_token 16/80  patching first_token 17/80  patching first_token 18/80  patching first_token 19/80  patching first_token 20/80  patching first_token 21/80  patching first_token 22/80  patching first_token 23/80  patching first_token 24/80  patching first_token 25/80  patching first_token 26/80  patching first_token 27/80  patching first_token 28/80  patching first_token 29/80  patching first_token 30/80  patching first_token 31/80  patching first_token 32/80  patching first_token 33/80  patching first_token 34/80  patching first_token 35/80  patching first_token 36/80  patching first_token 37/80  patching first_token 38/80  patching first_token 39/80  patching first_token 40/80  patching first_token 41/80  patching first_token 42/80  patching first_token 43/80  patching first_token 44/80  patching first_token 45/80  patching first_token 46/80  patching first_token 47/80  patching first_token 48/80  patching first_token 49/80  patching first_token 50/80  patching first_token 51/80  patching first_token 52/80  patching first_token 53/80  patching first_token 54/80  patching first_token 55/80  patching first_token 56/80  patching first_token 57/80  patching first_token 58/80  patching first_token 59/80  patching first_token 60/80  patching first_token 61/80  patching first_token 62/80  patching first_token 63/80  patching first_token 64/80  patching first_token 65/80  patching first_token 66/80  patching first_token 67/80  patching first_token 68/80  patching first_token 69/80  patching first_token 70/80  patching first_token 71/80  patching first_token 72/80  patching first_token 73/80  patching first_token 74/80  patching first_token 75/80  patching first_token 76/80  patching first_token 77/80  patching first_token 78/80  patching first_token 79/80  patching first_token 80/80
+  first_token: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.00 | 0%
+    L 2: +0.03 | 6%
+    L 4: +0.16 | 11%
+    L 6: +0.26 | 14%
+    L 8: +0.40 | 16%
+    L10: +0.54 | 28%
+    L12: +0.73 | 42%
+    L14: +0.85 | 59%
+    L16: +0.93 | 68%
+    L18: +0.98 | 74%
+    L20: +0.99 | 75%
+    L22: +1.00 | 75%
+    L24: +1.00 | 74%
+[hi] 80 pairs
+  patching preword 1/80  patching preword 2/80  patching preword 3/80  patching preword 4/80  patching preword 5/80  patching preword 6/80  patching preword 7/80  patching preword 8/80  patching preword 9/80  patching preword 10/80  patching preword 11/80  patching preword 12/80  patching preword 13/80  patching preword 14/80  patching preword 15/80  patching preword 16/80  patching preword 17/80  patching preword 18/80  patching preword 19/80  patching preword 20/80  patching preword 21/80  patching preword 22/80  patching preword 23/80  patching preword 24/80  patching preword 25/80  patching preword 26/80  patching preword 27/80  patching preword 28/80  patching preword 29/80  patching preword 30/80  patching preword 31/80  patching preword 32/80  patching preword 33/80  patching preword 34/80  patching preword 35/80  patching preword 36/80  patching preword 37/80  patching preword 38/80  patching preword 39/80  patching preword 40/80  patching preword 41/80  patching preword 42/80  patching preword 43/80  patching preword 44/80  patching preword 45/80  patching preword 46/80  patching preword 47/80  patching preword 48/80  patching preword 49/80  patching preword 50/80  patching preword 51/80  patching preword 52/80  patching preword 53/80  patching preword 54/80  patching preword 55/80  patching preword 56/80  patching preword 57/80  patching preword 58/80  patching preword 59/80  patching preword 60/80  patching preword 61/80  patching preword 62/80  patching preword 63/80  patching preword 64/80  patching preword 65/80  patching preword 66/80  patching preword 67/80  patching preword 68/80  patching preword 69/80  patching preword 70/80  patching preword 71/80  patching preword 72/80  patching preword 73/80  patching preword 74/80  patching preword 75/80  patching preword 76/80  patching preword 77/80  patching preword 78/80  patching preword 79/80  patching preword 80/80
+  preword: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.24 | 16%
+    L 2: +0.23 | 12%
+    L 4: +0.17 | 12%
+    L 6: +0.14 | 10%
+    L 8: +0.10 | 5%
+    L10: +0.08 | 4%
+    L12: +0.06 | 2%
+    L14: +0.03 | 0%
+    L16: +0.02 | 0%
+    L18: +0.00 | 0%
+    L20: +0.00 | 0%
+    L22: +0.00 | 0%
+    L24: +0.00 | 0%
+  patching first_token 1/80  patching first_token 2/80  patching first_token 3/80  patching first_token 4/80  patching first_token 5/80  patching first_token 6/80  patching first_token 7/80  patching first_token 8/80  patching first_token 9/80  patching first_token 10/80  patching first_token 11/80  patching first_token 12/80  patching first_token 13/80  patching first_token 14/80  patching first_token 15/80  patching first_token 16/80  patching first_token 17/80  patching first_token 18/80  patching first_token 19/80  patching first_token 20/80  patching first_token 21/80  patching first_token 22/80  patching first_token 23/80  patching first_token 24/80  patching first_token 25/80  patching first_token 26/80  patching first_token 27/80  patching first_token 28/80  patching first_token 29/80  patching first_token 30/80  patching first_token 31/80  patching first_token 32/80  patching first_token 33/80  patching first_token 34/80  patching first_token 35/80  patching first_token 36/80  patching first_token 37/80  patching first_token 38/80  patching first_token 39/80  patching first_token 40/80  patching first_token 41/80  patching first_token 42/80  patching first_token 43/80  patching first_token 44/80  patching first_token 45/80  patching first_token 46/80  patching first_token 47/80  patching first_token 48/80  patching first_token 49/80  patching first_token 50/80  patching first_token 51/80  patching first_token 52/80  patching first_token 53/80  patching first_token 54/80  patching first_token 55/80  patching first_token 56/80  patching first_token 57/80  patching first_token 58/80  patching first_token 59/80  patching first_token 60/80  patching first_token 61/80  patching first_token 62/80  patching first_token 63/80  patching first_token 64/80  patching first_token 65/80  patching first_token 66/80  patching first_token 67/80  patching first_token 68/80  patching first_token 69/80  patching first_token 70/80  patching first_token 71/80  patching first_token 72/80  patching first_token 73/80  patching first_token 74/80  patching first_token 75/80  patching first_token 76/80  patching first_token 77/80  patching first_token 78/80  patching first_token 79/80  patching first_token 80/80
+  first_token: layer -> normalized effect (median) | exact transfer of X's continuation
+    L 0: +0.00 | 0%
+    L 2: +0.03 | 0%
+    L 4: +0.13 | 4%
+    L 6: +0.26 | 14%
+    L 8: +0.38 | 24%
+    L10: +0.50 | 35%
+    L12: +0.64 | 52%
+    L14: +0.78 | 71%
+    L16: +0.88 | 82%
+    L18: +0.97 | 82%
+    L20: +0.99 | 86%
+    L22: +0.99 | 88%
+    L24: +1.00 | 89%
