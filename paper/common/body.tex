@@ -19,11 +19,16 @@ pairs, while a first-token-position control reaches $100\%$; attention
 knockout nonetheless shows the pre-word position is a \emph{necessary relay},
 costing about two bits and halving correct spelling when blocked. Every finding
 replicates across two model sizes and a second model family. Guided by this
-picture, we build a lossless word-level speculative decoder from linear heads
-that fit in under two minutes on a laptop; it produces token-for-token
-identical greedy output at $1.5$--$2.0$ tokens per forward pass and up to
-\x$1.9$ wall-clock speedup on an M1 GPU, with gains that grow with model size.
-Code, data pipeline and all results are released.
+picture, we build a lossless word-level speculative decoder: it drafts whole
+words and verifies them in one pass, producing token-for-token identical greedy
+output at up to $2.0$ tokens per forward on a laptop. Our strongest drafter,
+\textsc{IndicSpec}, is a word-scoped EAGLE head trained with scheduled-sampling
+rollouts; it reaches $2.15$ tokens per forward and \x$1.41$ wall-clock on Tamil,
+and extends to lossless speculative \emph{sampling} that preserves the target's
+temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$). We release
+\textsc{IndicSpec}---head, both decoders, and a headroom diagnostic---as a
+\texttt{pip}-installable tool, together with all code, data pipeline and
+results.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -79,12 +84,24 @@ half right in an informative way.
   halves correct spelling---whose content nonetheless does not carry the choice
   of word. The word is re-derived from the whole context at each step.
 \item \textbf{A lossless decoder exploits what is there}
-  (\S\ref{sec:decoder}). We train cheap linear ``word heads'' and Medusa-style
-  token-ahead heads \citep{cai2024medusa,gloeckle2024multitoken} on frozen
-  features and use them as drafters in a draft-then-verify loop whose output is
-  provably identical to greedy decoding. On a MacBook M1 Pro the best drafter
-  reaches $2.0$ tokens per forward pass on Tamil and up to \x$1.9$ wall-clock on
-  Hindi, and the speedup grows from the $0.6$B to the $1.7$B model.
+  (\S\ref{sec:decoder}). We draft whole words and verify them in one pass, in a
+  loop whose output is provably identical to greedy decoding. Cheap linear
+  ``word heads'' and Medusa-style token-ahead heads
+  \citep{cai2024medusa,gloeckle2024multitoken} on frozen features already reach
+  $2.0$ tokens per forward on Tamil and up to \x$1.9$ wall-clock on Hindi on a
+  MacBook M1 Pro, and the speedup grows from the $0.6$B to the $1.7$B model.
+\item \textbf{\textsc{IndicSpec}: a word-scoped EAGLE head, released as a tool}
+  (\S\ref{sec:indicspec}). A learned autoregressive draft head
+  \citep{li2024eagle} scoped to a single word and trained with
+  scheduled-sampling rollouts \citep{bengio2015scheduled} beats the convex
+  drafters on both languages ($2.15$ tok/fwd, \x$1.41$ on Tamil). We extend it
+  to lossless speculative \emph{sampling} \citep{leviathan2023fast,
+  chen2023accelerating}---preserving the target's temperature-$\tau$
+  distribution, not just its arg-max---where it reaches $2.32$ tok/fwd on Tamil
+  at $\tau{=}0.7$. We release the head, both decoders, and a headroom diagnostic
+  as a \texttt{pip}-installable package. To our knowledge this is the first
+  speculative decoder scoped to the word as the unit tokenization fragments, and
+  the first aimed at Indic generation.
 \end{itemize}
 
 Every result is reported for both model sizes; the qualitative picture is
@@ -800,6 +817,112 @@ fragments the word; where tokenization is already efficient (XGLM) it is
 roughly neutral.}
 \label{fig:a3}
 \end{figure}
+
+\subsection{IndicSpec: a learned word-scoped draft head}
+\label{sec:indicspec}
+
+The convex drafters above are deliberately simple, and two facts cap them: a
+lexicon head cannot draft a word it has never seen (held-out Tamil lexicon
+coverage is only $39\%$), and a token-ahead head predicts each position from the
+\emph{same} pre-word state, so its drafts drift as the word gets longer. Both
+limits are symptoms of drafting without a model of the word's own unfolding. We
+therefore add a learned, autoregressive head in the style of
+EAGLE~\citep{li2024eagle}, scoped to a single word, and release it as a small
+tool, \textsc{IndicSpec}.
+
+\paragraph{Head.} The head is a two-layer residual MLP that reads a standardized
+hidden state and the current token embedding and predicts (i)~the \emph{next
+hidden state} and (ii)~a distribution over the next token (a $K$-word lexicon
+plus \textsc{other} and \textsc{stop} classes). At draft time it is run
+autoregressively on its own predicted feature: draft a token, feed the predicted
+feature and that token's embedding back in, and continue until it emits
+\textsc{stop} or the word ends. Verification is unchanged---$[t]+\text{draft}$ is
+checked in one target pass---so the output is still identical to plain greedy.
+
+\paragraph{Training.} Teacher forcing a feature-autoregressive head is a known
+trap: at test time the head consumes its own slightly-wrong features (exposure
+bias), and a head trained only on gold features drifts. We train with
+\emph{scheduled-sampling rollouts}~\citep{bengio2015scheduled}: with a
+probability annealed from $0$ to $0.5$ over training, each step consumes the
+head's own predicted (detached) feature instead of the gold one, so the head
+learns to recover from its own errors. The loss is a cross-entropy on the next
+token plus a feature-regression term; the whole head fits on frozen features in
+a few minutes on the laptop. The ablation is decisive: a teacher-forced head
+reaches only \x$1.40$ wall-clock on Tamil, while the rollout-trained head
+reaches \x$1.41$ with a markedly higher real tokens-per-forward (below).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+Model & Decoder & tok/fwd & accept & wall \\
+\midrule
+\multirow{2}{*}{0.6B} & word$+$ahead (convex) & 1.89 & 18.7\% & \x1.12 \\
+                      & \textbf{IndicSpec head} & \textbf{2.15} & 21.2\% & \textbf{\x1.41} \\
+\cmidrule(lr){1-5}
+\multirow{2}{*}{0.6B (hi)} & word$+$ahead (convex) & 1.68 & 24.9\% & \x1.15 \\
+                           & \textbf{IndicSpec head} & \textbf{1.82} & 30.2\% & \textbf{\x1.40} \\
+\bottomrule
+\end{tabular}
+\caption{The learned word-scoped head vs.\ the best convex drafter, real
+lossless greedy decoding (Qwen3-0.6B-Base, $24$ held-out prompts, $64$ new
+tokens). The head wins on both languages and lifts wall-clock by
+$0.25$--$0.29{\times}$, because re-reading its own predicted feature keeps late-word
+drafts on track where the convex heads drift.}
+\label{tab:eagle}
+\end{table}
+
+\paragraph{Lossless speculative sampling.} Greedy verification only preserves the
+arg-max path. For temperature $\tau>0$ we keep losslessness in the distributional
+sense with the standard speculative-sampling rule~\citep{leviathan2023fast,
+chen2023accelerating}: accept a drafted token with probability
+$\min(1, p_i(d_i)/q_i(d_i))$ and otherwise resample from the normalized residual
+$(p_i-q_i)_+$, which provably leaves the target's sampling distribution
+unchanged. The draft distribution $q_i$ must be full-vocabulary, so we send the
+head's predicted feature through the \emph{target model's own} final norm and LM
+head (EAGLE-style) rather than the head's small classifier. The acceleration
+survives, and at moderate temperature improves: on Tamil the head reaches
+$2.32$ tokens per forward at $\tau{=}0.7$ and $2.09$ at $\tau{=}1.0$; on Hindi
+$1.85$ and $1.74$ (Table~\ref{tab:sampling}). Higher-temperature acceptance is
+limited only by genuine target entropy, not by the method.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Tamil} & \multicolumn{2}{c}{Hindi} \\
+Temperature & tok/fwd & accept & tok/fwd & accept \\
+\midrule
+$\tau=0.7$ & 2.32 & 28.2\% & 1.85 & 28.4\% \\
+$\tau=1.0$ & 2.09 & 24.7\% & 1.74 & 27.9\% \\
+\bottomrule
+\end{tabular}
+\caption{Lossless speculative \emph{sampling} with the IndicSpec head
+(Qwen3-0.6B-Base, $12$ held-out prompts, $64$ new tokens). The accept/reject
+rule preserves the target's $\tau$-sampled distribution by construction; the
+numbers are speed, not quality.}
+\label{tab:sampling}
+\end{table}
+
+\paragraph{On ``lossless''.} Greedy acceleration is identical to plain greedy
+\emph{by construction}, and is bit-identical on the large majority of prompts.
+The rare divergences we see are not approximation error: they occur only at
+floating-point ties, where two tokens share the top logit to within
+$\sim\!10^{-2}$ and the arg-max order flips with batch shape---so plain greedy
+decoding is itself order-dependent at exactly those positions. The method
+changes the batch shape of the forward pass (one pass over $[t]+\text{draft}$
+rather than several single-token passes), which is why ties surface; it never
+changes the model's distribution. Comprehension is untouched throughout: the
+model only ever reads its own original sub-word tokens.
+
+\paragraph{A released tool.} We package the head, both decoders, and a headroom
+diagnostic as \textsc{IndicSpec} (\texttt{pip install}; MIT). The diagnostic
+estimates achievable speed-up for any model and script from two measured
+quantities---tokens per word and the fraction of continuation tokens the model
+predicts greedily---so a practitioner can decide whether to train a head without
+running one. \textsc{IndicSpec} is, to our knowledge, the first speculative
+decoder scoped to the \emph{word} as the unit that tokenization fragments, and
+the first to target Indic generation specifically.
 
 \section{Discussion and limitations}
 

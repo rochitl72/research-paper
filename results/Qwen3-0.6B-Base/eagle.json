@@ -1,0 +1,166 @@
+{
+  "args": {
+    "model": "Qwen/Qwen3-0.6B-Base",
+    "langs": [
+      "ta",
+      "hi"
+    ],
+    "vocab": 4000,
+    "hidden": 1024,
+    "epochs": 30,
+    "max_draft": 10,
+    "prompts": 24,
+    "prompt_tokens": 32,
+    "new_tokens": 64,
+    "device": "auto",
+    "dtype": "auto"
+  },
+  "env": {
+    "python": "3.11.14",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpus": 8,
+    "time": "2026-10-07 16:53:20 IST",
+    "model": "Qwen/Qwen3-0.6B-Base",
+    "device": "mps",
+    "dtype": "torch.float16",
+    "n_layers": 28,
+    "d_model": 1024
+  },
+  "by_lang": {
+    "ta": {
+      "emulation": {
+        "oracle": {
+          "words": 1582,
+          "tokens": 15595,
+          "steps": 6616,
+          "steps_per_token": 0.4242385379929465,
+          "step_reduction": 2.3571644498186215,
+          "acceptance": 0.20599706341194823,
+          "whole_word_first_draft": 0.07395701643489254
+        },
+        "word_head_then_ahead": {
+          "words": 1582,
+          "tokens": 15595,
+          "steps": 9476,
+          "steps_per_token": 0.6076306508496313,
+          "step_reduction": 1.6457365977205571,
+          "acceptance": 0.17439010487916096,
+          "whole_word_first_draft": 0.022756005056890013
+        },
+        "eagle": {
+          "words": 1582,
+          "tokens": 15595,
+          "steps": 10239,
+          "steps_per_token": 0.6565565886502084,
+          "step_reduction": 1.5230979587850375,
+          "acceptance": 0.13945737645159612,
+          "whole_word_first_draft": 0.01580278128950695
+        },
+        "eagle_then_head": {
+          "words": 1582,
+          "tokens": 15595,
+          "steps": 9842,
+          "steps_per_token": 0.6310997114459763,
+          "step_reduction": 1.5845356634830319,
+          "acceptance": 0.1476415336447159,
+          "whole_word_first_draft": 0.01643489254108723
+        }
+      },
+      "decoding": {
+        "plain": {
+          "tokens_per_forward": 1.0,
+          "wallclock_speedup": 1.0,
+          "acceptance": 0.0
+        },
+        "word_head_then_ahead": {
+          "tokens_per_forward": 1.8939580764488286,
+          "wallclock_speedup": 1.1244792441903033,
+          "acceptance": 0.18666323377960864
+        },
+        "eagle": {
+          "tokens_per_forward": 2.1333333333333333,
+          "wallclock_speedup": 1.3195302009173198,
+          "acceptance": 0.21194805194805194
+        },
+        "eagle_then_head": {
+          "tokens_per_forward": 2.1452513966480447,
+          "wallclock_speedup": 1.4052618794783902,
+          "acceptance": 0.21232522009321594
+        }
+      },
+      "lossless": false,
+      "fit_seconds": 74.01427102088928,
+      "n_train": 28877,
+      "vocab": 645
+    },
+    "hi": {
+      "emulation": {
+        "oracle": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 8194,
+          "steps_per_token": 0.5071172174774106,
+          "step_reduction": 1.9719306809860875,
+          "acceptance": 0.2984224528796792,
+          "whole_word_first_draft": 0.30244648318042816
+        },
+        "word_head_then_ahead": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 10059,
+          "steps_per_token": 0.6225399183067212,
+          "step_reduction": 1.606322696093051,
+          "acceptance": 0.2603962086926821,
+          "whole_word_first_draft": 0.20703363914373088
+        },
+        "eagle": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 10681,
+          "steps_per_token": 0.6610347815323678,
+          "step_reduction": 1.512779702275068,
+          "acceptance": 0.2456604619869926,
+          "whole_word_first_draft": 0.19694189602446482
+        },
+        "eagle_then_head": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 10411,
+          "steps_per_token": 0.6443247926723604,
+          "step_reduction": 1.5520122946883104,
+          "acceptance": 0.24840076071922546,
+          "whole_word_first_draft": 0.19724770642201836
+        }
+      },
+      "decoding": {
+        "plain": {
+          "tokens_per_forward": 1.0,
+          "wallclock_speedup": 1.0,
+          "acceptance": 0.0
+        },
+        "word_head_then_ahead": {
+          "tokens_per_forward": 1.6805251641137855,
+          "wallclock_speedup": 1.153196785313302,
+          "acceptance": 0.24870051979208316
+        },
+        "eagle": {
+          "tokens_per_forward": 1.779837775202781,
+          "wallclock_speedup": 1.2784457749718456,
+          "acceptance": 0.30716567777270654
+        },
+        "eagle_then_head": {
+          "tokens_per_forward": 1.8156028368794326,
+          "wallclock_speedup": 1.398134611696195,
+          "acceptance": 0.3021015761821366
+        }
+      },
+      "lossless": false,
+      "fit_seconds": 146.93436002731323,
+      "n_train": 53840,
+      "vocab": 522
+    }
+  }
+}

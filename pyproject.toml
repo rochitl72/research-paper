@@ -23,9 +23,10 @@ dev = ["pytest"]
 
 [project.scripts]
 wordhead = "wordhead.cli:main"
+indicspec = "indicspec.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["wordhead*"]
+include = ["wordhead*", "indicspec*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

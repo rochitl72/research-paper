@@ -1,0 +1,46 @@
+{
+  "args": {
+    "model": "Qwen/Qwen3-0.6B-Base",
+    "langs": [
+      "ta",
+      "hi"
+    ],
+    "temps": [
+      0.7,
+      1.0
+    ],
+    "prompts": 12,
+    "prompt_tokens": 32,
+    "new_tokens": 64
+  },
+  "by_lang": {
+    "ta": {
+      "T=0.7": {
+        "tokens_per_forward": 2.3235778904434894,
+        "tok_per_fwd_std": 0.3237087484010403,
+        "acceptance": 0.28194978327738157,
+        "n_prompts": 12
+      },
+      "T=1.0": {
+        "tokens_per_forward": 2.091825870613102,
+        "tok_per_fwd_std": 0.5679442069447307,
+        "acceptance": 0.24748528586766802,
+        "n_prompts": 12
+      }
+    },
+    "hi": {
+      "T=0.7": {
+        "tokens_per_forward": 1.8533896392456815,
+        "tok_per_fwd_std": 0.2664417392308467,
+        "acceptance": 0.2840488509911911,
+        "n_prompts": 12
+      },
+      "T=1.0": {
+        "tokens_per_forward": 1.7422693236669329,
+        "tok_per_fwd_std": 0.22523314708481107,
+        "acceptance": 0.2787735912391322,
+        "n_prompts": 12
+      }
+    }
+  }
+}
