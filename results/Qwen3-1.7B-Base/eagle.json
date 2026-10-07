@@ -1,0 +1,99 @@
+{
+  "args": {
+    "model": "Qwen/Qwen3-1.7B-Base",
+    "langs": [
+      "hi"
+    ],
+    "vocab": 4000,
+    "hidden": 1024,
+    "epochs": 30,
+    "max_draft": 10,
+    "prompts": 24,
+    "prompt_tokens": 32,
+    "new_tokens": 64,
+    "device": "auto",
+    "dtype": "auto"
+  },
+  "env": {
+    "python": "3.11.14",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpus": 8,
+    "time": "2026-10-07 17:36:42 IST",
+    "model": "Qwen/Qwen3-1.7B-Base",
+    "device": "mps",
+    "dtype": "torch.float16",
+    "n_layers": 28,
+    "d_model": 2048
+  },
+  "by_lang": {
+    "hi": {
+      "emulation": {
+        "oracle": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 7267,
+          "steps_per_token": 0.4497462557247184,
+          "step_reduction": 2.2234759873400303,
+          "acceptance": 0.3617609960532205,
+          "whole_word_first_draft": 0.3761467889908257
+        },
+        "word_head_then_ahead": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 9606,
+          "steps_per_token": 0.5945042703304865,
+          "step_reduction": 1.6820737039350406,
+          "acceptance": 0.28815199225965343,
+          "whole_word_first_draft": 0.23302752293577983
+        },
+        "eagle": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 10257,
+          "steps_per_token": 0.6347939101373933,
+          "step_reduction": 1.5753144194208832,
+          "acceptance": 0.2657389894623075,
+          "whole_word_first_draft": 0.21681957186544343
+        },
+        "eagle_then_head": {
+          "words": 3270,
+          "tokens": 16158,
+          "steps": 9975,
+          "steps_per_token": 0.6173412551058299,
+          "step_reduction": 1.6198496240601503,
+          "acceptance": 0.27105343913024416,
+          "whole_word_first_draft": 0.21681957186544343
+        }
+      },
+      "decoding": {
+        "plain": {
+          "tokens_per_forward": 1.0,
+          "wallclock_speedup": 1.0,
+          "acceptance": 0.0
+        },
+        "word_head_then_ahead": {
+          "tokens_per_forward": 1.7922987164527422,
+          "wallclock_speedup": 1.7329282270383728,
+          "acceptance": 0.28722504230118445
+        },
+        "eagle": {
+          "tokens_per_forward": 1.8177514792899407,
+          "wallclock_speedup": 2.033645874628214,
+          "acceptance": 0.30615861763402746
+        },
+        "eagle_then_head": {
+          "tokens_per_forward": 1.8573155985489722,
+          "wallclock_speedup": 2.0953175359362253,
+          "acceptance": 0.3000423190859077
+        }
+      },
+      "lossless": false,
+      "fit_seconds": 278.42481994628906,
+      "n_train": 53840,
+      "vocab": 522
+    }
+  }
+}
