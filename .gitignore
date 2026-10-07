@@ -22,3 +22,14 @@ paper/**/*.blg
 paper/**/*.bbl
 paper/**/*.out
 paper/**/*.synctex.gz
+
+# latexmk build databases
+paper/**/*.fdb_latexmk
+paper/**/*.fls
+*.fdb_latexmk
+*.fls
+
+# run logs
+*.log
+logs/
+eagle_1p7b.log
