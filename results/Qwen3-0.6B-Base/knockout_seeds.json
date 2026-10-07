@@ -1,0 +1,95 @@
+{
+  "env": {
+    "python": "3.11.14",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpus": 8,
+    "time": "2026-10-07 11:04:50 IST",
+    "model": "Qwen/Qwen3-0.6B-Base",
+    "device": "mps",
+    "dtype": "torch.float16",
+    "n_layers": 28,
+    "d_model": 1024
+  },
+  "args": {
+    "model": "Qwen/Qwen3-0.6B-Base",
+    "langs": [
+      "ta",
+      "hi"
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "words": 200,
+    "device": "auto",
+    "dtype": "auto"
+  },
+  "by_lang": {
+    "ta": {
+      "n_seeds": 3,
+      "words": 200,
+      "preword_bits": {
+        "mean": -2.314397788480282,
+        "sd": 0.13159330581345488,
+        "values": [
+          -2.5,
+          -2.222,
+          -2.221
+        ]
+      },
+      "random_bits": {
+        "mean": -0.06376943989821116,
+        "sd": 0.03203653749860686,
+        "values": [
+          -0.02,
+          -0.095,
+          -0.077
+        ]
+      },
+      "still_spelled": {
+        "mean": 0.26999999999999996,
+        "sd": 0.028577380332470412,
+        "values": [
+          0.255,
+          0.31,
+          0.245
+        ]
+      }
+    },
+    "hi": {
+      "n_seeds": 3,
+      "words": 200,
+      "preword_bits": {
+        "mean": -1.9173971541542532,
+        "sd": 0.09629782984167445,
+        "values": [
+          -1.803,
+          -2.039,
+          -1.91
+        ]
+      },
+      "random_bits": {
+        "mean": -0.011231665587104867,
+        "sd": 0.0070112514378885375,
+        "values": [
+          -0.002,
+          -0.013,
+          -0.019
+        ]
+      },
+      "still_spelled": {
+        "mean": 0.5283333333333333,
+        "sd": 0.008498365855987981,
+        "values": [
+          0.52,
+          0.525,
+          0.54
+        ]
+      }
+    }
+  }
+}

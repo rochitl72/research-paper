@@ -458,7 +458,10 @@ nothing ($\le 0.25$ bits) and leaves spelling almost intact. The pre-word cost
 dwarfs the random-position control on a paired test (Wilcoxon $p<10^{-30}$ for
 both languages and models); the bootstrap $95\%$ CI on the mean cost is, e.g.,
 $[-2.82,-2.23]$ bits for Tamil on $1.7$B versus $[-0.05,+0.01]$ for a random
-position.
+position. The result is stable across three random resamplings of the test
+words: the pre-word cost is $2.3\pm0.1$ bits (Tamil) and $1.9\pm0.1$ (Hindi) on
+$0.6$B, and $2.4\pm0.3$ and $1.9\pm0.1$ on $1.7$B, while the random-position
+cost stays within noise of zero in every seed.
 
 \begin{table}[t]
 \centering\small

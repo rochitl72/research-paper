@@ -1,0 +1,8 @@
+
+===== 09_knockout_seeds_Qwen3-1.7B-Base | 2026-10-07 11:10:49 | argv: --model Qwen/Qwen3-1.7B-Base --seeds 0 1 2 --words 150
+[ta seed 0] pre-word -2.69 bits (random -0.03), still-spelled 0.28
+[ta seed 1] pre-word -1.98 bits (random -0.01), still-spelled 0.36
+[ta seed 2] pre-word -2.42 bits (random -0.02), still-spelled 0.29
+[hi seed 0] pre-word -1.83 bits (random -0.01), still-spelled 0.54
+[hi seed 1] pre-word -1.81 bits (random -0.01), still-spelled 0.59
+[hi seed 2] pre-word -2.09 bits (random -0.01), still-spelled 0.52
