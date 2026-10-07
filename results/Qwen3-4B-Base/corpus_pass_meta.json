@@ -1,0 +1,65 @@
+{
+  "env": {
+    "python": "3.11.14",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpus": 8,
+    "time": "2026-10-08 01:09:09 IST",
+    "model": "/Users/rochitlen/wordhead-research/models/Qwen3-4B-Base",
+    "device": "mps",
+    "dtype": "torch.float16",
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "args": {
+    "model": "/Users/rochitlen/wordhead-research/models/Qwen3-4B-Base",
+    "langs": [
+      "ta",
+      "hi"
+    ],
+    "n_fit": 1800,
+    "n_eval": 500,
+    "max_len": 256,
+    "batch_size": 2,
+    "inword_positions": 6,
+    "layer_step": 999,
+    "device": "auto",
+    "dtype": "auto"
+  },
+  "hidden_layers": [
+    0,
+    36
+  ],
+  "runs": [
+    {
+      "lang": "ta",
+      "split": "fit",
+      "paragraphs": 1800,
+      "tokens": 370408,
+      "seconds": 1068.217260837555
+    },
+    {
+      "lang": "ta",
+      "split": "eval",
+      "paragraphs": 500,
+      "tokens": 101760,
+      "seconds": 294.732470035553
+    },
+    {
+      "lang": "hi",
+      "split": "fit",
+      "paragraphs": 1800,
+      "tokens": 345786,
+      "seconds": 1001.3450517654419
+    },
+    {
+      "lang": "hi",
+      "split": "eval",
+      "paragraphs": 500,
+      "tokens": 106678,
+      "seconds": 309.261461019516
+    }
+  ]
+}
