@@ -1,4 +1,4 @@
-"""Word-scoped autoregressive draft head (EAGLE-style), the IndicSpec core.
+"""Word-scoped autoregressive draft head (EAGLE-style), the TokenLift core.
 
 Unlike the flat linear word/ahead heads, this head rolls out a word's
 continuation tokens AUTOREGRESSIVELY at the feature level: from the current

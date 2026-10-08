@@ -22,13 +22,13 @@ replicates across two model sizes and a second model family. Guided by this
 picture, we build a lossless word-level speculative decoder: it drafts whole
 words and verifies them in one pass, producing token-for-token identical greedy
 output at up to $2.0$ tokens per forward on a laptop. Our strongest drafter,
-\textsc{IndicSpec}, is a word-scoped EAGLE head trained with scheduled-sampling
+\textsc{TokenLift}, is a word-scoped EAGLE head trained with scheduled-sampling
 rollouts; it beats the convex drafters at every scale (0.6B, 1.7B, 4B), with a
 wall-clock payoff that jumps from \x$1.4$ at $0.6$B to \x$1.7$--\x$2.1$ at the
 larger $1.7$B--$4$B models, and extends to lossless speculative \emph{sampling}
 that preserves the target's
 temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$). We release
-\textsc{IndicSpec}---head, both decoders, and a headroom diagnostic---as a
+\textsc{TokenLift}---head, both decoders, and a headroom diagnostic---as a
 \texttt{pip}-installable tool, together with all code, data pipeline and
 results.
 \end{abstract}
@@ -92,8 +92,8 @@ half right in an informative way.
   \citep{cai2024medusa,gloeckle2024multitoken} on frozen features already reach
   $2.0$ tokens per forward on Tamil and up to \x$1.9$ wall-clock on Hindi on a
   MacBook M1 Pro, and the speedup grows from the $0.6$B to the $1.7$B model.
-\item \textbf{\textsc{IndicSpec}: a word-scoped EAGLE head, released as a tool}
-  (\S\ref{sec:indicspec}). A learned autoregressive draft head
+\item \textbf{\textsc{TokenLift}: a word-scoped EAGLE head, released as a tool}
+  (\S\ref{sec:tokenlift}). A learned autoregressive draft head
   \citep{li2024eagle} scoped to a single word and trained with
   scheduled-sampling rollouts \citep{bengio2015scheduled} beats the convex
   drafters on every language and model size (0.6B, 1.7B, 4B), and its wall-clock
@@ -822,8 +822,8 @@ roughly neutral.}
 \label{fig:a3}
 \end{figure}
 
-\subsection{IndicSpec: a learned word-scoped draft head}
-\label{sec:indicspec}
+\subsection{TokenLift: a learned word-scoped draft head}
+\label{sec:tokenlift}
 
 The convex drafters above are deliberately simple, and two facts cap them: a
 lexicon head cannot draft a word it has never seen (held-out Tamil lexicon
@@ -832,7 +832,7 @@ coverage is only $39\%$), and a token-ahead head predicts each position from the
 limits are symptoms of drafting without a model of the word's own unfolding. We
 therefore add a learned, autoregressive head in the style of
 EAGLE~\citep{li2024eagle}, scoped to a single word, and release it as a small
-tool, \textsc{IndicSpec}.
+tool, \textsc{TokenLift}.
 
 \paragraph{Head.} The head is a two-layer residual MLP that reads a standardized
 hidden state and the current token embedding and predicts (i)~the \emph{next
@@ -862,22 +862,22 @@ reaches \x$1.41$ with a markedly higher real tokens-per-forward (below).
 Model & Decoder & tok/fwd & accept & wall \\
 \midrule
 \multirow{2}{*}{0.6B, Ta} & convex (word$+$ahead) & 1.89 & 18.7\% & \x1.12 \\
-                          & \textbf{IndicSpec head} & \textbf{2.15} & 21.2\% & \textbf{\x1.41} \\
+                          & \textbf{TokenLift head} & \textbf{2.15} & 21.2\% & \textbf{\x1.41} \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{0.6B, Hi} & convex (word$+$ahead) & 1.68 & 24.9\% & \x1.15 \\
-                          & \textbf{IndicSpec head} & \textbf{1.82} & 30.2\% & \textbf{\x1.40} \\
+                          & \textbf{TokenLift head} & \textbf{1.82} & 30.2\% & \textbf{\x1.40} \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{1.7B, Ta} & convex (word$+$ahead) & 2.00 & 21.3\% & \x1.40 \\
-                          & \textbf{IndicSpec head} & \textbf{2.26} & 23.6\% & \textbf{\x1.84} \\
+                          & \textbf{TokenLift head} & \textbf{2.26} & 23.6\% & \textbf{\x1.84} \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{1.7B, Hi} & convex (word$+$ahead) & 1.79 & 28.7\% & \x1.73 \\
-                          & \textbf{IndicSpec head} & \textbf{1.86} & 30.0\% & \textbf{\x2.10} \\
+                          & \textbf{TokenLift head} & \textbf{1.86} & 30.0\% & \textbf{\x2.10} \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{4.0B, Ta} & convex (word$+$ahead) & 2.03 & 22.0\% & \x1.66 \\
-                          & \textbf{IndicSpec head} & \textbf{2.23} & 24.5\% & \textbf{\x1.73} \\
+                          & \textbf{TokenLift head} & \textbf{2.23} & 24.5\% & \textbf{\x1.73} \\
 \cmidrule(lr){1-5}
 \multirow{2}{*}{4.0B, Hi} & convex (word$+$ahead) & 1.82 & 30.9\% & \x1.97 \\
-                          & \textbf{IndicSpec head} & \textbf{1.98} & 38.0\% & \textbf{\x2.09} \\
+                          & \textbf{TokenLift head} & \textbf{1.98} & 38.0\% & \textbf{\x2.09} \\
 \bottomrule
 \end{tabular}
 \caption{The learned word-scoped head vs.\ the best convex drafter, real
@@ -918,7 +918,7 @@ $\tau=0.7$ & 2.32 & 28.2\% & 1.85 & 28.4\% \\
 $\tau=1.0$ & 2.09 & 24.7\% & 1.74 & 27.9\% \\
 \bottomrule
 \end{tabular}
-\caption{Lossless speculative \emph{sampling} with the IndicSpec head
+\caption{Lossless speculative \emph{sampling} with the TokenLift head
 (Qwen3-0.6B-Base, $12$ held-out prompts, $64$ new tokens). The accept/reject
 rule preserves the target's $\tau$-sampled distribution by construction; the
 numbers are speed, not quality.}
@@ -937,11 +937,11 @@ changes the model's distribution. Comprehension is untouched throughout: the
 model only ever reads its own original sub-word tokens.
 
 \paragraph{A released tool.} We package the head, both decoders, and a headroom
-diagnostic as \textsc{IndicSpec} (\texttt{pip install}; MIT). The diagnostic
+diagnostic as \textsc{TokenLift} (\texttt{pip install}; MIT). The diagnostic
 estimates achievable speed-up for any model and script from two measured
 quantities---tokens per word and the fraction of continuation tokens the model
 predicts greedily---so a practitioner can decide whether to train a head without
-running one. \textsc{IndicSpec} is, to our knowledge, the first speculative
+running one. \textsc{TokenLift} is, to our knowledge, the first speculative
 decoder scoped to the \emph{word} as the unit that tokenization fragments, and
 the first to target Indic generation specifically.
 

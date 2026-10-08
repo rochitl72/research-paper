@@ -1,4 +1,4 @@
-"""IndicSpec: EAGLE head, lossless greedy/sampling paths, head I/O and CLI.
+"""TokenLift: EAGLE head, lossless greedy/sampling paths, head I/O and CLI.
 
 Uses the randomly initialised tiny Qwen3 (float64, so no argmax ties): a random,
 untrained head is a *bad* drafter, which is exactly what a losslessness test needs.
@@ -9,7 +9,7 @@ import sys
 import pytest
 import torch
 
-from indicspec import IndicSpec
+from tokenlift import TokenLift
 from wordhead.eagle import WordEagleHead
 
 PROMPTS = ["தமிழ்நாடு இந்தியாவின் தெற்கே அமைந்துள்ள", "भारत की राजधानी", "The capital of France is"]
@@ -18,7 +18,7 @@ N_VOCAB = 50
 
 @pytest.fixture()
 def spec(tiny_lm):
-    s = IndicSpec(tiny_lm)
+    s = TokenLift(tiny_lm)
     torch.manual_seed(1)
     head = WordEagleHead(tiny_lm.d_model, s.emb.shape[1], N_VOCAB, hidden=32)
     vocab = list(range(100, 100 + N_VOCAB))
@@ -60,7 +60,7 @@ def test_sampling_is_seeded_and_reports_stats(spec):
 def test_save_load_roundtrip(spec, tmp_path):
     path = tmp_path / "h.pt"
     spec.save_head("ta", path)
-    fresh = IndicSpec(spec.lm).load_head("ta", path)
+    fresh = TokenLift(spec.lm).load_head("ta", path)
     for k, v in spec.heads["ta"].state_dict().items():
         assert torch.equal(v, fresh.heads["ta"].state_dict()[k])
     assert fresh.vocabs["ta"] == spec.vocabs["ta"]
@@ -69,18 +69,18 @@ def test_save_load_roundtrip(spec, tmp_path):
 def test_load_bare_state_dict_needs_matching_vocab(spec, tmp_path):
     path = tmp_path / "bare.pt"
     torch.save(spec.heads["ta"].state_dict(), path)
-    ok = IndicSpec(spec.lm).load_head("ta", path, vocab=spec.vocabs["ta"])
+    ok = TokenLift(spec.lm).load_head("ta", path, vocab=spec.vocabs["ta"])
     assert "ta" in ok.heads
     with pytest.raises(AssertionError):
-        IndicSpec(spec.lm).load_head("ta", path, vocab=spec.vocabs["ta"][:-1])
+        TokenLift(spec.lm).load_head("ta", path, vocab=spec.vocabs["ta"][:-1])
 
 
 def test_generate_without_head_raises(tiny_lm):
     with pytest.raises(RuntimeError):
-        IndicSpec(tiny_lm).generate("hello", max_new=4)
+        TokenLift(tiny_lm).generate("hello", max_new=4)
 
 
 def test_cli_help():
-    r = subprocess.run([sys.executable, "-m", "indicspec.cli", "--help"], capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-m", "tokenlift.cli", "--help"], capture_output=True, text=True)
     assert r.returncode == 0
     assert "report" in r.stdout and "gen" in r.stdout

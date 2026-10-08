@@ -1,4 +1,4 @@
-"""IndicSpec public API: load a target model, fit/attach a word-scoped EAGLE
+"""TokenLift public API: load a target model, fit/attach a word-scoped EAGLE
 head, and generate with the lossless word-level speculative decoder."""
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from wordhead.eagle import (WordEagleDrafter, WordEagleHead, ahead_vocab,
                             eagle_seq_data, fit_word_eagle_rollout)
 
 
-class IndicSpec:
+class TokenLift:
     def __init__(self, lm):
         self.lm = lm
         self.seg = Segmenter(lm.tokenizer)

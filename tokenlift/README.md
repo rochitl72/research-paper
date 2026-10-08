@@ -1,11 +1,11 @@
-# IndicSpec
+# TokenLift
 
 **Lossless word-level speculative decoding for Indic-script LLMs.**
 
 Byte-level BPE tokenizers shatter Indic words into many sub-word tokens — Tamil
 averages ~9 tokens per word, Hindi ~5, against ~1.1 for English. Most of those
 tokens are *spelling*: once the model has committed to a word, emitting its
-remaining pieces is near-deterministic. IndicSpec exploits this with a small
+remaining pieces is near-deterministic. TokenLift exploits this with a small
 **word-scoped EAGLE head** that drafts the rest of a word in feature space, and
 verifies the draft against the target model in a single forward pass. Output is
 **identical to the target's own decoding** (greedy), or drawn from the **target's
@@ -14,15 +14,15 @@ exact sampling distribution** (temperature > 0) — never an approximation.
 ## Install
 
 ```bash
-pip install -e .          # from the repository root (installs wordhead + indicspec)
+pip install -e .          # from the repository root (installs wordhead + tokenlift)
 ```
 
 ## Quick start
 
 ```python
-from indicspec import IndicSpec
+from tokenlift import TokenLift
 
-spec = IndicSpec.from_pretrained("Qwen/Qwen3-0.6B-Base")
+spec = TokenLift.from_pretrained("Qwen/Qwen3-0.6B-Base")
 
 # train a word-scoped head per language on a cached corpus (one-time)
 spec.fit(langs=["ta", "hi"], epochs=30)
@@ -41,10 +41,10 @@ Load a saved head later with `spec.load_head("ta", "head_ta.pt")`.
 
 ```bash
 # how much headroom does a model have on your text? (no head needed)
-indicspec report --model Qwen/Qwen3-0.6B-Base --text-file samples_ta.txt
+tokenlift report --model Qwen/Qwen3-0.6B-Base --text-file samples_ta.txt
 
 # generate from a trained head (temperature 0 = greedy, >0 = sampling)
-indicspec gen --model Qwen/Qwen3-0.6B-Base --lang ta --head head_ta.pt \
+tokenlift gen --model Qwen/Qwen3-0.6B-Base --lang ta --head head_ta.pt \
               --prompt "தமிழ்நாட்டின் தலைநகரம்" --temperature 0.8
 ```
 
@@ -54,10 +54,10 @@ indicspec gen --model Qwen/Qwen3-0.6B-Base --lang ta --head head_ta.pt \
 |----------|---------------------------------|------------------|------------|
 | Tamil    | plain                           | 1.00             | ×1.00      |
 | Tamil    | dictionary hybrid (baseline)    | 1.89             | ×1.12      |
-| Tamil    | **IndicSpec (EAGLE head)**      | **2.15**         | **×1.41**  |
+| Tamil    | **TokenLift (EAGLE head)**      | **2.15**         | **×1.41**  |
 | Hindi    | plain                           | 1.00             | ×1.00      |
 | Hindi    | dictionary hybrid (baseline)    | 1.68             | ×1.15      |
-| Hindi    | **IndicSpec (EAGLE head)**      | **1.82**         | **×1.40**  |
+| Hindi    | **TokenLift (EAGLE head)**      | **1.82**         | **×1.40**  |
 
 Speculative **sampling** (temperature 0.7–1.0) keeps essentially the same
 tokens-per-forward as greedy; see `results/<model>/sampling.json`.
@@ -91,12 +91,12 @@ multi-step drafting at inference (mitigating exposure bias).
 
 ## API
 
-- `IndicSpec.from_pretrained(model_name)` — load a target model.
+- `TokenLift.from_pretrained(model_name)` — load a target model.
 - `.fit(langs, epochs=30, vocab_size=4000, max_draft=8)` — train a head per language.
 - `.save_head(lang, path)` / `.load_head(lang, path)` — persist heads (with vocab).
 - `.generate(prompt, max_new, lang, accelerate=True)` — lossless greedy.
 - `.sample(prompt, max_new, temperature, lang, seed)` — lossless speculative sampling.
-- `indicspec.diagnostic.headroom(lm, texts)` — predict achievable speed-up from
+- `tokenlift.diagnostic.headroom(lm, texts)` — predict achievable speed-up from
   tokenizer fragmentation and the model's continuation predictability.
 
 Part of the *Words before tokens* study. MIT licensed.

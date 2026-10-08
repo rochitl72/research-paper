@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wordhead"
+name = "tokenlift"
 version = "0.1.0"
 description = "Measure how much of an LLM's output is spent spelling out words it has already decided on, probe the internal word plan, and decode whole words losslessly."
 readme = "README.md"
@@ -23,10 +23,10 @@ dev = ["pytest"]
 
 [project.scripts]
 wordhead = "wordhead.cli:main"
-indicspec = "indicspec.cli:main"
+tokenlift = "tokenlift.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["wordhead*", "indicspec*"]
+include = ["wordhead*", "tokenlift*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

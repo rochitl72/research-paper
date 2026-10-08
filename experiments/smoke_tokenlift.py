@@ -1,11 +1,11 @@
-"""End-to-end smoke test for the IndicSpec package: load a saved head, run
+"""End-to-end smoke test for the TokenLift package: load a saved head, run
 lossless greedy generate (accelerated vs plain), lossless speculative sample,
 and the headroom diagnostic."""
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from indicspec import IndicSpec
-from indicspec.diagnostic import headroom
+from tokenlift import TokenLift
+from tokenlift.diagnostic import headroom
 from experiments.common import load_texts
 
 MODEL = "Qwen/Qwen3-0.6B-Base"
@@ -16,7 +16,7 @@ texts = load_texts("ta", "eval", 40)
 prompt = texts[0][:120]
 print("PROMPT:", prompt[:80], "...\n")
 
-spec = IndicSpec.from_pretrained(MODEL)
+spec = TokenLift.from_pretrained(MODEL)
 spec.load_head("ta", HEAD)
 print("head loaded: vocab=%d\n" % len(spec.vocabs["ta"]))
 

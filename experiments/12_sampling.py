@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 
-from indicspec import IndicSpec
+from tokenlift import TokenLift
 from experiments.common import load_texts, cache_path, results_dir, write_json, slug
 
 
@@ -22,7 +22,7 @@ def main():
     ap.add_argument("--new-tokens", type=int, default=64)
     a = ap.parse_args()
 
-    spec = IndicSpec.from_pretrained(a.model)
+    spec = TokenLift.from_pretrained(a.model)
     out = {"args": vars(a), "by_lang": {}}
     for lang in a.langs:
         head_pt = cache_path(a.model, lang, "eagle_head").with_suffix(".pt")

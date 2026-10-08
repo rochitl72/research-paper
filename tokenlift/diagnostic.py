@@ -1,4 +1,4 @@
-"""Headroom diagnostic: given a model and some text, estimate how much IndicSpec
+"""Headroom diagnostic: given a model and some text, estimate how much TokenLift
 can accelerate generation, per language, from the tokenizer's fragmentation and
 the model's own continuation predictability."""
 from __future__ import annotations

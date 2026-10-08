@@ -1,4 +1,4 @@
-"""Lossless speculative *sampling* for the word-scoped EAGLE head (IndicSpec).
+"""Lossless speculative *sampling* for the word-scoped EAGLE head (TokenLift).
 
 Greedy verification only guarantees the arg-max path. For temperature > 0 we use
 the standard speculative-sampling accept/reject rule (Leviathan et al., 2023;

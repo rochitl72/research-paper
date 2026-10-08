@@ -1,14 +1,14 @@
-"""IndicSpec command line: a headroom report, or a quick accelerated generation.
+"""TokenLift command line: a headroom report, or a quick accelerated generation.
 
-    indicspec report --model Qwen/Qwen3-0.6B-Base --lang ta
-    indicspec gen    --model Qwen/Qwen3-0.6B-Base --lang ta --head head_ta.pt --prompt "..."
+    tokenlift report --model Qwen/Qwen3-0.6B-Base --lang ta
+    tokenlift gen    --model Qwen/Qwen3-0.6B-Base --lang ta --head head_ta.pt --prompt "..."
 """
 import argparse
 import json
 
 
 def main():
-    ap = argparse.ArgumentParser(prog="indicspec")
+    ap = argparse.ArgumentParser(prog="tokenlift")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("report", help="estimate acceleration headroom for a model on a text sample")
@@ -25,11 +25,11 @@ def main():
     g.add_argument("--temperature", type=float, default=0.0)
 
     a = ap.parse_args()
-    from indicspec import IndicSpec
-    spec = IndicSpec.from_pretrained(a.model)
+    from tokenlift import TokenLift
+    spec = TokenLift.from_pretrained(a.model)
 
     if a.cmd == "report":
-        from indicspec.diagnostic import headroom
+        from tokenlift.diagnostic import headroom
         with open(a.text_file, encoding="utf-8") as f:
             texts = [ln.strip() for ln in f if ln.strip()]
         print(json.dumps(headroom(spec.lm, texts, n=a.n), indent=2))
