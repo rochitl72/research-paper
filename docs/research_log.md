@@ -78,8 +78,7 @@ head) before it goes in a paper as a claim.
 
 ### Things that did not work or are still open
 
-- A push from the cloud workspace is not possible (no write access for the Claude GitHub
-  app); commits are made on the Mac.
+- Experiments and commits are run and pushed from the author's Mac (M1 Pro, 16 GB).
 - Wall-clock speedups are measured with batch size 1 on MPS. On CPU the same decoder is
   slower than plain decoding because extra draft tokens are not free there.
 - Greedy decoding only. Lossless speculative *sampling* needs the standard
