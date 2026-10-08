@@ -42,9 +42,9 @@ patching, speculative decoding, low-resource NLP, Indic languages.
 
 A language model that writes Tamil or Hindi does far more sequential work per
 word than one writing English. Under the byte-level BPE tokenizer shared by
-most modern models \citep{radford2019gpt2,sennrich2016bpe}, a Tamil word is
-split into $9.6$ tokens on average and a Hindi word into $4.8$, against $1.1$
-for English. Each of those tokens is one sequential forward pass at
+most modern models \citep{radford2019gpt2,sennrich2016bpe}, a Tamil word in
+Wikipedia text is split by Qwen3's tokenizer into $9.6$ tokens on average and a
+Hindi word into $4.8$, against $1.1$ for English. Each of those tokens is one sequential forward pass at
 generation time, so the same sentence costs several times more latency and
 money in an Indic script than in English---a disparity documented for
 tokenization cost and fairness \citep{petrov2023tokenizers,ahia2023costs}.
@@ -187,7 +187,9 @@ work is done once.}
 \paragraph{Models.} We study Qwen3-0.6B-Base and Qwen3-1.7B-Base
 \citep{qwen2024}: same tokenizer and depth (28 transformer blocks), hidden
 size $1024$ and $2048$ respectively. Both are base (non-instruct) models, run
-in float32 on a MacBook M1 Pro (16\,GB, Metal/MPS). All analysis is
+in float32 on a MacBook M1 Pro (16\,GB, Metal/MPS). The decoder experiments
+additionally use Qwen3-4B-Base (hidden size $2560$, $36$ blocks), run in float16
+with $1{,}800$ fit paragraphs per language to fit in memory. All analysis is
 teacher-forced: we never sample, so every number is deterministic given the
 text.
 
@@ -958,12 +960,14 @@ position acting as a necessary relay rather than a store. A lossless decoder
 built on this reads the freshest state, drafts a whole word, and recovers a
 good part of the latency lost to fragmentation.
 
-\paragraph{Limitations.} (i) Three models---two Qwen3 sizes and a second family,
-XGLM-564M---across which every finding replicates; still, two families with
-$\le 1.7$B parameters is a narrow sweep, and larger models and more families
-(Gemma, Llama) are future work. (ii) Greedy decoding only; lossless
-speculative \emph{sampling} needs the standard accept/reject rule, which we have
-not implemented. (iii) Wall-clock numbers are batch-size-1 on Metal/MPS and
+\paragraph{Limitations.} (i) The mechanistic analysis covers three models---two
+Qwen3 sizes ($\le 1.7$B) and a second family, XGLM-564M---and the decoder is
+evaluated on Qwen3-0.6B, 1.7B and 4B for Tamil and Hindi. Two tokenizer families
+and $\le 4$B parameters is a narrow sweep: 7--8B models do not fit this
+single-laptop setup, and other families (Gemma, Llama) are future work.
+(ii) Greedy decoding is exact. Speculative \emph{sampling} preserves the target
+distribution by the standard accept/reject rule, but we benchmark it only on
+Qwen3-0.6B (Table~\ref{tab:sampling}). (iii) Wall-clock numbers are batch-size-1 on Metal/MPS and
 include Python-side drafter overhead; on CPU the extra draft tokens are not free
 and the same decoder is slower than plain decoding. (iv) Patching uses
 $50$--$80$ context pairs and knockout $300$ words; we report bootstrap $95\%$
@@ -981,9 +985,10 @@ the mechanism conclusion rests on converging evidence from a probe, patching,
 and knockout rather than a single test, and we report bootstrap CIs and paired
 nonparametric tests (\S\ref{sec:causal}, Fig.~\ref{fig:a8}) with seed-robustness
 for the knockout; the whole-layer knockout is still coarser than per-head path
-patching. \emph{External:} three models up to $1.7$B parameters, two tokenizer
-families, Wikipedia text, and greedy decoding; larger models, more domains, and
-speculative \emph{sampling} remain to be tested. \emph{Reproducibility:} every
+patching. \emph{External:} mechanistic analysis on three models up to $1.7$B
+parameters and decoder results up to $4$B, two tokenizer families, Wikipedia
+text, and speculative sampling benchmarked on one model; larger models, more
+domains, and more languages remain to be tested. \emph{Reproducibility:} every
 number is produced from released JSON by a report script, and the full pipeline
 runs on a single consumer laptop.
 

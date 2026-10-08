@@ -99,4 +99,4 @@ multi-step drafting at inference (mitigating exposure bias).
 - `tokenlift.diagnostic.headroom(lm, texts)` — predict achievable speed-up from
   tokenizer fragmentation and the model's continuation predictability.
 
-Part of the *Words before tokens* study. MIT licensed.
+Companion code to the paper *TokenLift: Exploiting Latent Word Plans for Exact Word-Level Speculative Decoding in Byte-BPE Indic Language Models*. MIT licensed.

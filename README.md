@@ -1,14 +1,17 @@
-# wordhead
+# TokenLift
+
+**TokenLift: Exploiting Latent Word Plans for Exact Word-Level Speculative Decoding in Byte-BPE Indic Language Models**
 
 How much of what a language model writes in Tamil or Hindi is just spelling, when does the
 model know which word it is writing, and can that knowledge make generation faster without
-changing the output?
+changing the output? This repository holds the paper sources (IEEE Access and arXiv versions),
+the `tokenlift` tool, the `wordhead` research code, experiment scripts, raw results, figures and
+run logs.
 
-This repository holds the code, experiment scripts, raw results, figures and run logs for
-that study, kept in a form the paper can be written from.
-
-**Status (2026-10-04):** code complete and tested; full pipeline run on Qwen3-0.6B-Base on a
-MacBook M1 Pro. The paper is not drafted yet. Start with [`docs/results.md`](docs/results.md).
+**Status (2026-10-08):** code, tests and both papers complete; mechanistic analysis on Qwen3-0.6B/1.7B
+(+ XGLM-564M) and decoder results on Qwen3-0.6B/1.7B/4B for Tamil and Hindi, all run on a MacBook M1 Pro.
+Start with [`tokenlift/README.md`](tokenlift/README.md) for the tool or [`docs/results.md`](docs/results.md)
+for results. Licensed MIT.
 
 ## Headline results (Qwen3-0.6B-Base)
 
