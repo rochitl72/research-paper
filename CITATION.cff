@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "TokenLift: Exploiting Latent Word Plans for Exact Word-Level Speculative Decoding in Byte-BPE Indic Language Models"
+authors:
+  - family-names: "L."
+    given-names: "Rochit"
+    email: "rochitl72@gmail.com"
+date-released: 2026-10-08
+license: MIT
+repository-code: "https://github.com/rochitl72/research-paper"
+keywords:
+  - speculative decoding
+  - Tamil
+  - Hindi
+  - byte-level BPE
+  - mechanistic interpretability
