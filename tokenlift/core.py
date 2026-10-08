@@ -23,7 +23,24 @@ class TokenLift:
 
     # ---------- construction ----------
     @classmethod
-    def from_pretrained(cls, model_name: str, device: str = "auto", dtype: str = "auto"):
+    def from_pretrained(cls, model_name: str, device: str = "auto", dtype: str = "float32"):
+        """Load a target model.
+
+        ``dtype`` defaults to ``"float32"`` so that lossless greedy decoding is
+        bit-identical to the model's own greedy output. On Apple-GPU (MPS) and
+        other half-precision paths, near-tied logits can flip with batch shape,
+        so a fast run may differ from a plain run at a tie; this is a property
+        of float arithmetic, not of the method. Pass ``dtype="float16"`` (or
+        ``"bfloat16"``) for speed when exact bit-identity is not required.
+        """
+        if dtype in ("float16", "bfloat16"):
+            import warnings
+            warnings.warn(
+                f"TokenLift loaded in {dtype}: greedy output may differ from "
+                "plain greedy decoding at floating-point ties. Use "
+                'dtype="float32" for strict bit-identity.',
+                stacklevel=2,
+            )
         return cls(_load(model_name, device=device, dtype=dtype))
 
     def fit(self, langs, records_fn=None, vocab_size=4000, epochs=30, max_draft=8):

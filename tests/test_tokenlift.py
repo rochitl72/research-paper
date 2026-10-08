@@ -84,3 +84,29 @@ def test_cli_help():
     r = subprocess.run([sys.executable, "-m", "tokenlift.cli", "--help"], capture_output=True, text=True)
     assert r.returncode == 0
     assert "report" in r.stdout and "gen" in r.stdout
+
+
+
+def test_from_pretrained_defaults_to_float32(monkeypatch):
+    """The tool defaults to float32 so greedy output is bit-identical."""
+    import tokenlift.core as core
+
+    seen = {}
+
+    def fake_load(name, device="auto", dtype="auto"):
+        seen["dtype"] = dtype
+        raise RuntimeError("stop before real load")  # we only inspect the dtype
+
+    monkeypatch.setattr(core, "_load", fake_load)
+    with pytest.raises(RuntimeError):
+        core.TokenLift.from_pretrained("any/model")
+    assert seen["dtype"] == "float32"
+
+
+def test_from_pretrained_warns_on_half_precision(monkeypatch):
+    import tokenlift.core as core
+
+    monkeypatch.setattr(core, "_load", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("stop")))
+    with pytest.warns(UserWarning, match="float32"):
+        with pytest.raises(RuntimeError):
+            core.TokenLift.from_pretrained("any/model", dtype="float16")

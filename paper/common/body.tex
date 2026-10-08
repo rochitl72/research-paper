@@ -695,7 +695,8 @@ $[t] + \text{draft}$ and accept drafted tokens for as long as they equal the
 model's own greedy argmax, cropping the KV cache on the first rejection. Because
 acceptance is defined by the target model's argmax, the output is
 token-for-token identical to plain greedy decoding by construction; we also
-verify this empirically on every prompt. Algorithm~\ref{alg:decode} states the
+verify this empirically, with the only exceptions being floating-point ties
+(discussed under ``On `lossless'\,'' below). Algorithm~\ref{alg:decode} states the
 loop, and Fig.~\ref{fig:b4} shows it schematically.
 
 \begin{algorithm}[t]
@@ -767,7 +768,8 @@ word + ahead & \textbf{2.00} & \x1.67 & \textbf{1.75} & \x1.83 \\
 \bottomrule
 \end{tabular}
 \caption{Real lossless greedy decoding on Qwen3-1.7B (12 held-out prompts,
-$64$ new tokens each). Output was identical to plain greedy on every prompt.
+$64$ new tokens each). Output matched plain greedy on every prompt up to
+floating-point ties (see text).
 ``tok/fwd'' is accepted tokens per forward pass; ``wall'' is wall-clock speedup
 on the M1 GPU.}
 \label{tab:decode}
@@ -783,15 +785,16 @@ plain-decoding baseline of one.}
 \end{figure*}
 
 \paragraph{Results.} Table~\ref{tab:decode} reports real decoding on the
-$1.7$B model; output was identical to plain greedy on all prompts, and the same
-held for $0.6$B. The best drafter reaches $2.0$ accepted tokens per forward pass
+$1.7$B model; output matched plain greedy up to floating-point ties on all
+prompts, and the same held for $0.6$B. The best drafter reaches $2.0$ accepted tokens per forward pass
 on Tamil and gives a wall-clock speedup of \x$1.67$--\x$1.73$ on Tamil and
 \x$1.83$--\x$1.92$ on Hindi, even though every drafter runs in pure Python on
 top of the model. Reading the model's \emph{current} state beats the
 context-blind dictionary consistently, and the gain over plain decoding is
 larger on $1.7$B than on $0.6$B (e.g.\ Tamil word+ahead, \x1.46 to \x1.67
 wall-clock), because the fixed cost of the linear heads is amortized against a
-more expensive base forward pass---the method pays off more as the model grows.
+more expensive base forward pass. The full trend across all three sizes,
+including where it plateaus at $4$B, is reported in Table~\ref{tab:eagle}.
 Bootstrap $95\%$ CIs over prompts put the best drafter's tokens per forward pass
 clearly above one on every model and language (e.g.\ Tamil $[1.88,2.20]$ on
 $1.7$B); the wall-clock speedup is noisier on throttled MPS but positive on
@@ -929,6 +932,9 @@ numbers are speed, not quality.}
 
 \paragraph{On ``lossless''.} Greedy acceleration is identical to plain greedy
 \emph{by construction}, and is bit-identical on the large majority of prompts.
+(The decoder runs reported here use float16 on the laptop GPU, where such ties
+are more frequent than in float32; the released tool defaults to float32 for
+strict bit-identity.)
 The rare divergences we see are not approximation error: they occur only at
 floating-point ties, where two tokens share the top logit to within
 $\sim\!10^{-2}$ and the arg-max order flips with batch shape---so plain greedy
