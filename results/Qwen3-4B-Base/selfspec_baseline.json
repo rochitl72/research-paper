@@ -1,0 +1,46 @@
+{
+ "args": {
+  "target": "/Users/rochitlen/wordhead-research/models/Qwen3-4B-Base",
+  "draft": "Qwen/Qwen3-0.6B-Base",
+  "langs": [
+   "ta",
+   "hi"
+  ],
+  "prompts": 12,
+  "prompt_tokens": 32,
+  "new_tokens": 64,
+  "K": 5,
+  "verify": 2,
+  "draft_device": "auto"
+ },
+ "env": {
+  "python": "3.11.14",
+  "torch": "2.14.1",
+  "transformers": "5.18.0",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "processor": "arm",
+  "cpus": 8,
+  "time": "2026-10-09 11:56:12 IST",
+  "model": "/Users/rochitlen/wordhead-research/models/Qwen3-4B-Base",
+  "device": "mps",
+  "dtype": "torch.float16",
+  "n_layers": 36,
+  "d_model": 2560
+ },
+ "by_lang": {
+  "ta": {
+   "tokens_per_target_forward": 3.398230088495575,
+   "exact_match_vs_plain": 2,
+   "n_prompts": 12,
+   "K": 5,
+   "seconds": 201.33907628059387
+  },
+  "hi": {
+   "tokens_per_target_forward": 3.226890756302521,
+   "exact_match_vs_plain": 2,
+   "n_prompts": 12,
+   "K": 5,
+   "seconds": 185.61109590530396
+  }
+ }
+}

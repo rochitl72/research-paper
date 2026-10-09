@@ -69,10 +69,12 @@ def main():
     ap.add_argument("--prompt-tokens", type=int, default=32)
     ap.add_argument("--new-tokens", type=int, default=64)
     ap.add_argument("--K", type=int, default=5)
+    ap.add_argument("--verify", type=int, default=3, help="run plain-greedy exact check on first N prompts only")
+    ap.add_argument("--draft-device", default="cpu")
     args = ap.parse_args()
 
     tgt = load(args.target, device="auto", dtype="float16")
-    draft = load(args.draft, device="cpu", dtype="float32")
+    draft = load(args.draft, device=args.draft_device, dtype="float16" if args.draft_device != "cpu" else "float32")
     tdev = next(tgt.model.parameters()).device
     ddev = next(draft.model.parameters()).device
     print(f"target on {tdev}, draft on {ddev}, K={args.K}", flush=True)
@@ -87,10 +89,11 @@ def main():
         for i, t in enumerate(texts):
             ids = tgt.tokenizer(t, add_special_tokens=False)["input_ids"][: args.prompt_tokens]
             toks, passes = spec_decode(draft, tgt, ids, args.new_tokens, args.K, tdev, ddev)
-            ref = plain_greedy(tgt, ids, args.new_tokens, tdev)
             tgt_fwd_total += passes
             new_total += len(toks)
-            exact += int(toks == ref)
+            if i < args.verify:
+                ref = plain_greedy(tgt, ids, args.new_tokens, tdev)
+                exact += int(toks == ref)
             print(f"  [{lang}] {i+1}/{len(texts)}  tok/fwd {new_total/max(tgt_fwd_total,1):.2f}  exact {exact}/{i+1}", flush=True)
         tpf = new_total / max(tgt_fwd_total, 1)
         out["by_lang"][lang] = dict(tokens_per_target_forward=tpf, exact_match_vs_plain=exact,

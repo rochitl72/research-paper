@@ -28,8 +28,13 @@ rollouts; it beats the convex drafters at every scale (0.6B, 1.7B, 4B), with a
 wall-clock payoff that jumps from \x$1.4$ at $0.6$B to \x$1.7$--\x$2.1$ at the
 larger $1.7$B--$4$B models, and extends to lossless speculative \emph{sampling}
 that preserves the target's
-temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$). We release
-\textsc{TokenLift}---head, both decoders, and a headroom diagnostic---as a
+temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$).
+\textsc{TokenLift} needs \emph{no} separate draft model; a standard same-family
+draft model (Qwen3-0.6B drafting $4$B), where one exists, accepts more per pass
+($\approx\!3.3$ vs.\ $2.2$ tokens/forward), so we position \textsc{TokenLift} as
+a lightweight, single-model accelerator for when a draft model is unavailable or
+memory is tight, not as a replacement for draft-model speculative decoding. We
+release it---head, both decoders, and a headroom diagnostic---as a
 \texttt{pip}-installable tool, together with all code, data pipeline and
 results.
 \end{abstract}
@@ -503,6 +508,23 @@ Every probe$-$control gap is large relative to seed variation (3 seeds): Tamil
 $+12.5$ points at $43$ SD and Hindi $+24.7$ at $58$ SD on $0.6$B, rising to $46$
 and $83$ SD on $1.7$B.
 
+\paragraph{Does the probe exceed the model's own predictions?} The dictionary
+and control baselines are context-blind, so a natural worry is that the probe
+succeeds merely because the hidden state sees the context. We therefore add a
+\emph{logit-lens} baseline that uses the model's own computation: within each
+first-token group we rank the candidate words by the model's teacher-forced
+likelihood of the whole word given the context (the strongest single readout of
+what the model itself predicts). On a matched subset ($150$ examples, groups
+capped at $20$ candidates) this baseline reaches $16.7\%$ (Tamil) and $46.7\%$
+(Hindi) top-1, against majority $2.0\%$/$29.3\%$---i.e.\ \emph{comparable to the
+pre-word probe} ($14.5\%$/$39.8\%$ on the full eval), not below it. We read this
+honestly: the probe does not extract word identity \emph{beyond} what the model
+itself predicts; rather, the pre-word state already contains, in linearly
+decodable form, essentially the same word information the model surfaces through
+its own distribution. This is consistent with---and strengthens---our causal
+finding below that the pre-word signal is re-derived predictive context
+(``breadcrumbs''), not a privileged stored plan the probe alone can see.
+
 \paragraph{As the word unfolds.} We then probe the state available after
 $j=1,\dots,6$ tokens of the word have been written, against only those
 candidate words consistent with the $j$-token prefix, and compare to a
@@ -921,6 +943,47 @@ baseline throughout.}
 \label{tab:eagle}
 \end{table}
 
+\paragraph{Comparison to standard self-speculation.} The obvious same-tokenizer
+baseline is ordinary speculative decoding with a smaller model of the same
+family as the drafter. We run it on the $4$B target with Qwen3-0.6B-Base as the
+draft model ($K{=}5$, greedy, same prompts; textbook accept/reject,
+\citep{leviathan2023fast,chen2023accelerating}), and it is \emph{stronger} than
+our word-scoped head on accepted tokens per forward: $3.40$ vs.\ $2.23$ on
+Tamil and $3.23$ vs.\ $1.98$ on Hindi (Table~\ref{tab:selfspec}; both exact
+against plain $4$B greedy on the verified prompts). This is expected, and we
+state it plainly: a full draft model is unrestricted---it drafts across word
+boundaries and uses far more capacity than a two-layer head---so it accepts more
+per pass. Word scoping is a \emph{restriction}, and it costs acceptance.
+
+What the word-scoped head buys instead is that it needs \emph{no separate draft
+model}. It is a $\sim$few-million-parameter head read off the target's own
+features, trained in minutes on a laptop, adding negligible memory; standard
+self-speculation must load and run a second $0.6$B model ($K$ sequential passes
+per step) alongside the target, and presupposes that a suitable smaller model
+with the \emph{same} tokenizer exists---often it does not, especially for the
+smallest deployable Indic models. TokenLift should therefore be read as a
+lightweight, single-model accelerator that recovers a useful part of the
+available headroom when a draft model is unavailable or memory is tight, not as
+a method that beats draft-model speculative decoding where that is an option.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{lrr}
+\toprule
+Decoder (4B target) & Tamil tok/fwd & Hindi tok/fwd \\
+\midrule
+standard self-spec (0.6B draft) & \textbf{3.40} & \textbf{3.23} \\
+TokenLift head (no draft model) & 2.23 & 1.98 \\
+\bottomrule
+\end{tabular}
+\caption{Standard self-speculative decoding (a full 0.6B draft model) vs.\ the
+draft-model-free word-scoped head, on the $4$B target, $12$ held-out prompts,
+$64$ new tokens, $K{=}5$, float16. Both are lossless (greedy output matches
+plain $4$B greedy; verified exactly on held-out prompts). The full draft model
+accepts more per pass; the head's advantage is that it needs no second model.}
+\label{tab:selfspec}
+\end{table}
+
 \paragraph{Lossless speculative sampling.} Greedy verification only preserves the
 arg-max path. For temperature $\tau>0$ we keep losslessness in the distributional
 sense with the standard speculative-sampling rule~\citep{leviathan2023fast,
@@ -1009,8 +1072,19 @@ and the same decoder is slower than plain decoding. (iv) Patching uses
 $50$--$80$ context pairs and knockout $300$ words; we report bootstrap $95\%$
 CIs and paired tests, and seed-robustness over the random selection, but the
 knockout is a whole-layer attention block, not a per-head path patch, so
-``necessary relay'' is a coarse claim pending finer analysis. (v) Wikipedia text only; the 20231101 dump may overlap the models'
-training data, which would inflate predictability. (vi) The causal reading in
+``necessary relay'' is a coarse claim pending finer analysis. (v) Wikipedia text
+only, and the 20231101 dump may overlap the models' training data. We note the
+scope of that threat precisely: it can inflate predictability-dependent
+quantities (the greedy-continuation rate, and hence drafter \emph{acceptance}
+and speed-up), but it cannot affect correctness---every decoder here is lossless
+by construction, so contamination changes how fast we go, never the output---nor
+the tokenizer-intrinsic descriptive findings (tokens-per-word and the
+first-token information share are deterministic functions of the tokenizer and
+UTF-8, independent of any training overlap). As partial evidence that the
+effects are not a single model's memorization artifact, every finding replicates
+across a held-out-by-sequence split and across two model families with different
+training data (Qwen3 and XGLM). A dedicated post-cutoff, non-Wikipedia Indic
+holdout remains the proper test and is future work. (vi) The causal reading in
 \S\ref{sec:causal} is an interpretation consistent with three experiments, not
 a validated circuit.
 

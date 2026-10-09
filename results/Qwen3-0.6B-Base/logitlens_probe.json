@@ -1,0 +1,26 @@
+{
+ "args": {
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "langs": [
+   "ta",
+   "hi"
+  ],
+  "max_examples": 150,
+  "max_candidates": 20,
+  "device": "auto"
+ },
+ "by_lang": {
+  "ta": {
+   "n": 150,
+   "logit_lens_top1": 0.16666666666666666,
+   "majority_top1": 0.02,
+   "mean_candidates": 979.7733333333333
+  },
+  "hi": {
+   "n": 150,
+   "logit_lens_top1": 0.4666666666666667,
+   "majority_top1": 0.29333333333333333,
+   "mean_candidates": 282.62
+  }
+ }
+}
