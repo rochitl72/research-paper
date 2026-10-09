@@ -1,0 +1,13 @@
+{
+ "head_params": {
+  "hi": 10545199,
+  "ta": 10806574
+ },
+ "head_params_mean": 10675886.5,
+ "draft_params": 596042752,
+ "target_params": 4022458880,
+ "head_MB_fp16": 21.35,
+ "draft_MB_fp16": 1192.1,
+ "ratio_draft_over_head": 55.8,
+ "head_pct_of_target": 0.265
+}

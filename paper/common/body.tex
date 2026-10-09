@@ -29,11 +29,13 @@ wall-clock payoff that jumps from \x$1.4$ at $0.6$B to \x$1.7$--\x$2.1$ at the
 larger $1.7$B--$4$B models, and extends to lossless speculative \emph{sampling}
 that preserves the target's
 temperature distribution ($2.32$ tokens per forward at $\tau{=}0.7$).
-\textsc{TokenLift} needs \emph{no} separate draft model; a standard same-family
-draft model (Qwen3-0.6B drafting $4$B), where one exists, accepts more per pass
-($\approx\!3.3$ vs.\ $2.2$ tokens/forward), so we position \textsc{TokenLift} as
-a lightweight, single-model accelerator for when a draft model is unavailable or
-memory is tight, not as a replacement for draft-model speculative decoding. We
+\textsc{TokenLift} needs \emph{no} separate draft model: the head is $21$~MB
+(fp16) against a $1.19$~GB draft model. A standard same-family draft model
+(Qwen3-0.6B drafting $4$B), where one exists, accepts more per pass
+($\approx\!3.3$ vs.\ $2.2$ tokens/forward) but at $56\times$ the auxiliary
+memory, so we position \textsc{TokenLift} as a lightweight, single-model
+accelerator for when a draft model is unavailable or memory is tight, not as a
+replacement for draft-model speculative decoding. We
 release it---head, both decoders, and a headroom diagnostic---as a
 \texttt{pip}-installable tool, together with all code, data pipeline and
 results.
@@ -956,31 +958,38 @@ boundaries and uses far more capacity than a two-layer head---so it accepts more
 per pass. Word scoping is a \emph{restriction}, and it costs acceptance.
 
 What the word-scoped head buys instead is that it needs \emph{no separate draft
-model}. It is a $\sim$few-million-parameter head read off the target's own
-features, trained in minutes on a laptop, adding negligible memory; standard
-self-speculation must load and run a second $0.6$B model ($K$ sequential passes
-per step) alongside the target, and presupposes that a suitable smaller model
-with the \emph{same} tokenizer exists---often it does not, especially for the
-smallest deployable Indic models. TokenLift should therefore be read as a
-lightweight, single-model accelerator that recovers a useful part of the
-available headroom when a draft model is unavailable or memory is tight, not as
-a method that beats draft-model speculative decoding where that is an option.
+model}. The trained head is $10.7$M parameters ($21$~MB in float16, just
+$0.27\%$ of the $4$B target), read off the target's own features and trained in
+minutes on a laptop. Standard self-speculation must instead keep a full
+$0.6$B model resident ($596$M parameters, $1.19$~GB in float16---$56\times$ the
+head, about a $15\%$ memory surcharge on the $4$B target) and run it $K$ times
+per step, and it presupposes that a suitable smaller model with the \emph{same}
+tokenizer exists---often it does not, especially for the smallest deployable
+Indic models. So the trade is explicit: self-speculation accepts more per pass
+($3.3$ vs.\ $2.2$) at $56\times$ the auxiliary memory and a draft-model
+dependency; TokenLift recovers a useful part of the headroom for a $21$~MB head
+and no second model. TokenLift should therefore be read as a lightweight,
+single-model accelerator for when a draft model is unavailable or memory is
+tight, not as a method that beats draft-model speculative decoding where that is
+an option.
 
 \begin{table}[t]
 \centering\small
-\begin{tabular}{lrr}
+\begin{tabular}{lrrr}
 \toprule
-Decoder (4B target) & Tamil tok/fwd & Hindi tok/fwd \\
+Decoder (4B target) & Ta tok/fwd & Hi tok/fwd & extra mem (fp16) \\
 \midrule
-standard self-spec (0.6B draft) & \textbf{3.40} & \textbf{3.23} \\
-TokenLift head (no draft model) & 2.23 & 1.98 \\
+standard self-spec (0.6B draft) & \textbf{3.40} & \textbf{3.23} & $1.19$\,GB \\
+TokenLift head (no draft model) & 2.23 & 1.98 & $21$\,MB \\
 \bottomrule
 \end{tabular}
 \caption{Standard self-speculative decoding (a full 0.6B draft model) vs.\ the
 draft-model-free word-scoped head, on the $4$B target, $12$ held-out prompts,
 $64$ new tokens, $K{=}5$, float16. Both are lossless (greedy output matches
 plain $4$B greedy; verified exactly on held-out prompts). The full draft model
-accepts more per pass; the head's advantage is that it needs no second model.}
+accepts more per pass, but at $56\times$ the auxiliary memory ($10.7$M-parameter
+head vs.\ a $596$M draft model) and only when a same-tokenizer draft model
+exists; the head needs no second model.}
 \label{tab:selfspec}
 \end{table}
 
