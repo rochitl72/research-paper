@@ -15,7 +15,8 @@ is written identifies the upcoming word far above dictionary and control
 baselines, and stays ahead of the written prefix as the word unfolds. Yet this
 information is not a localized ``plan'': activation patching of the pre-word
 position transfers the donor word in under $8\%$ of matched natural-context
-pairs, while a first-token-position control reaches $100\%$; attention
+pairs, whereas patching the first in-word position dominates it at every matched
+layer; attention
 knockout nonetheless shows the pre-word position is a \emph{necessary relay},
 costing about two bits and halving correct spelling when blocked. Every finding
 replicates across two model sizes and a second model family. Guided by this
@@ -62,7 +63,7 @@ pass, recovering the latency lost to fragmentation, with no change to the
 output distribution.
 
 We test this hypothesis directly on Qwen3-0.6B-Base and Qwen3-1.7B-Base
-\citep{qwen2024} over Tamil, Hindi and English Wikipedia, and find that it is
+\citep{qwen3} over Tamil, Hindi and English Wikipedia, and find that it is
 half right in an informative way.
 
 \begin{itemize}
@@ -129,7 +130,7 @@ We take this fragmentation as given and ask what it does to the model's
 cheap to predict.
 
 \paragraph{Speculative and parallel decoding.} Speculative decoding
-\citep{leviathan2023speculative,chen2023speculative} accelerates generation by
+\citep{leviathan2023fast,chen2023accelerating} accelerates generation by
 drafting tokens with a cheap proposer and verifying them in one pass of the
 target model, leaving the output distribution unchanged. Blockwise parallel
 decoding \citep{stern2018blockwise}, Medusa \citep{cai2024medusa} and EAGLE
@@ -169,7 +170,13 @@ heavily fragmented script, and---unlike these works---we pair the probe with
 patching and knockout to test whether that information is a localized stored
 plan (pre-caching) or re-derived from context at each step (breadcrumbs). For
 Indic words the answer is the latter, with the pre-word position acting only as
-a necessary relay.
+a necessary relay. This question is closely related to work on how sub-word
+models internally reconstruct whole words: \citet{kaplan2025tokens} show LLMs
+maintain a word-level ``inner lexicon'' that detokenizes multi-token words in
+the middle layers, and \citet{feucht2024erasure} find a token-erasure footprint
+marking where implicit vocabulary items are assembled. Our patching result
+localizes that assembly causally to the first in-word position rather than the
+pre-word position, and our decoder turns it to practical use.
 
 \section{Setup and definitions}
 \label{sec:setup}
@@ -185,7 +192,7 @@ work is done once.}
 \end{figure*}
 
 \paragraph{Models.} We study Qwen3-0.6B-Base and Qwen3-1.7B-Base
-\citep{qwen2024}: same tokenizer and depth (28 transformer blocks), hidden
+\citep{qwen3}: same tokenizer and depth (28 transformer blocks), hidden
 size $1024$ and $2048$ respectively. Both are base (non-instruct) models, run
 in float32 on a MacBook M1 Pro (16\,GB, Metal/MPS). The decoder experiments
 additionally use Qwen3-4B-Base (hidden size $2560$, $36$ blocks), run in float16
@@ -565,26 +572,34 @@ the normalized effect is
 so $\Delta=0$ leaves $B$ unchanged and $\Delta=1$ is fully $A$-like.
 
 The pre-word patch is weak at every layer and every scale: the median effect
-peaks around $0.08$ (Tamil) and $0.18$ (Hindi) in the middle layers and decays
-to zero by the last, and the donor word is spelled out in at most $4$--$6\%$ of
-pairs. The first-token-position control, by contrast, grows monotonically to an
-effect of $1.00$ at the last layer and transfers the full donor word in up to
-$44\%$ (Tamil) / $38\%$ (Hindi) of pairs (Figure~\ref{fig:patching}). In other
-words, the choice of word is \emph{not} sitting at the pre-word position waiting
-to be executed; it is assembled over the course of the word, and the position
-that accumulates the causal signal is the one \emph{inside} the word, late in
-the network. This directly contradicts the ``words before tokens'' hypothesis
-in its strong form. The contrast is unambiguous: at the last layer the
-first-token control transfers the donor word in $21$--$44\%$ of pairs while the
-pre-word patch transfers it in none, with no pair showing the reverse (McNemar
-$p<10^{-4}$ for every model and language).
+peaks around $0.08$ (Tamil) and $0.18$ (Hindi) in the middle layers, and the
+donor word is spelled out in at most $4$--$6\%$ of pairs. Patching the first
+\emph{in-word} position instead is far stronger \emph{at every matched layer}:
+at layer $18$ of $28$, for instance, its median effect is $0.53$ (Tamil) and
+$0.57$ (Hindi)---roughly nine and seven times the pre-word value at the same
+layer---and it transfers the full donor word in up to $44\%$ (Tamil) / $38\%$
+(Hindi) of pairs (Figure~\ref{fig:patching}). We deliberately read the contrast
+at the shared mid-to-late layers rather than at the endpoints: at the
+\emph{final} layer the in-word control reaches an effect of exactly $1.00$ and
+the pre-word effect falls to $0$ \emph{by construction}---a position's
+last-layer residual feeds only its own logits and is never read by the later
+word position---so those endpoints carry no causal information and no claim
+rests on them. The mid-network comparison is what matters, and it is
+unambiguous: the choice of word is \emph{not} sitting at the pre-word position
+waiting to be executed; it is assembled over the course of the word, and the
+position that accumulates the causal signal is the one \emph{inside} the word,
+in the late-middle layers. This contradicts the ``words before tokens''
+hypothesis in its strong form: across matched middle layers the in-word control
+transfers the donor word far more often than the pre-word patch, with no pair
+showing the reverse (McNemar $p<10^{-4}$ for every model and language).
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{Qwen3-0.6B-Base/fig5_patching.png}
 \caption{Activation patching, Qwen3-0.6B. Swapping the pre-word state (blue)
 barely changes which word is written; swapping the first in-word position
-(orange control) takes over the decision by the last layer. The word is not
+(orange control) dominates the decision across the mid-to-late layers (the
+exact $1.0$ at the final layer is constructional; see text). The word is not
 localized before it is written.}
 \label{fig:patching}
 \end{figure}
@@ -853,12 +868,20 @@ trap: at test time the head consumes its own slightly-wrong features (exposure
 bias), and a head trained only on gold features drifts. We train with
 \emph{scheduled-sampling rollouts}~\citep{bengio2015scheduled}: with a
 probability annealed from $0$ to $0.5$ over training, each step consumes the
-head's own predicted (detached) feature instead of the gold one, so the head
+head's own predicted (detached) feature instead of the gold one. This is the
+same remedy, specialized to a word-scoped head, that HASS and
+EAGLE-3 apply to full-sequence draft heads under the names
+harmonized training and the ``training-time test'' \citep{zhang2025hass,
+li2025eagle3}; our contribution is the word scoping and the Indic setting, not
+the self-feeding objective itself. With it, the head
 learns to recover from its own errors. The loss is a cross-entropy on the next
 token plus a feature-regression term; the whole head fits on frozen features in
-a few minutes on the laptop. The ablation is decisive: a teacher-forced head
-reaches only \x$1.40$ wall-clock on Tamil, while the rollout-trained head
-reaches \x$1.41$ with a markedly higher real tokens-per-forward (below).
+a few minutes on the laptop. The ablation is clearest on the quality signal,
+tokens per forward pass: the teacher-forced and rollout heads sit at essentially
+the same wall-clock on Tamil (\x$1.40$ vs \x$1.41$, within MPS timing noise),
+but the rollout head accepts markedly more tokens per forward (below)---the
+wall-clock parity reflects the head's tiny fixed cost, not equal drafting
+quality.
 
 \begin{table}[t]
 \centering\small
@@ -949,9 +972,16 @@ diagnostic as \textsc{TokenLift} (\texttt{pip install}; MIT). The diagnostic
 estimates achievable speed-up for any model and script from two measured
 quantities---tokens per word and the fraction of continuation tokens the model
 predicts greedily---so a practitioner can decide whether to train a head without
-running one. \textsc{TokenLift} is, to our knowledge, the first speculative
-decoder scoped to the \emph{word} as the unit that tokenization fragments, and
-the first to target Indic generation specifically.
+running one. We validate it against the measured oracle upper bound across three
+models and two languages (six configurations, including the low-fragmentation
+XGLM cases it should rate poorly): the predicted tokens-per-forward correlates
+with the measured oracle at Pearson $r=0.98$ with a mean absolute error of
+$0.10$ tokens per forward, and it correctly separates the high-headroom Qwen3
+Indic cases (predicted $2.1$--$2.6$) from the low-headroom XGLM cases (predicted
+$1.2$--$1.4$). The diagnostic is thus a reliable, training-free screen for where
+the method will pay off. \textsc{TokenLift} is, to our knowledge, the first
+speculative decoder scoped to the \emph{word} as the unit that tokenization
+fragments, and the first to target Indic generation specifically.
 
 \section{Discussion and limitations}
 
